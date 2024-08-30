@@ -64,6 +64,15 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!--> Gemini Dependency <!-->
+		<dependency>
+			<groupId>swiss.ameri</groupId>
+			<artifactId>gemini-api</artifactId>
+			<version>1beta.0.1.0</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
