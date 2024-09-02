@@ -18,16 +18,14 @@ import java.util.Date;
 public class PostEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank@NotNull@NotEmpty
     private Instant data;
 
     @NotBlank@NotNull@NotEmpty
     private String conteudo; // mudei o nome de descrição para conteudo
 
-    @NotBlank@NotNull@NotEmpty
     private boolean valido; // mudei de apagado para válido
 
     // associações com:
