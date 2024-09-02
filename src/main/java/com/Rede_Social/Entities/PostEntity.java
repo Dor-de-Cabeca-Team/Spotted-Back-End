@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Setter
@@ -21,7 +22,7 @@ public class PostEntity {
     private Long id;
 
     @NotBlank@NotNull@NotEmpty
-    private Date data;
+    private Instant data;
 
     @NotBlank@NotNull@NotEmpty
     private String conteudo; // mudei o nome de descrição para conteudo
