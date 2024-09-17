@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class GeminiService {
+    // commit teste
 
     @Value("${gemini.key}")
     private String GEMINI_KEY;
