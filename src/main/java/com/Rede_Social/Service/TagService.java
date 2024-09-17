@@ -19,7 +19,7 @@ public class TagService {
             return tagRepository.save(tag);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar a tag no repository: " + e.getMessage());
-            return new TagEntity();
+            throw new RuntimeException("Erro no service, não deu para salvar a tag no repository: " + e.getMessage());
         }
     }
 
@@ -30,7 +30,7 @@ public class TagService {
             return tagRepository.save(tag);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para atualizar a tag no repository: " + e.getMessage());
-            return new TagEntity();
+            throw new RuntimeException("Erro no service, não deu para atualizar a tag no repository: " + e.getMessage());
         }
     }
 
@@ -40,13 +40,12 @@ public class TagService {
             return "Tag deletada";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para deletar a tag no repository: " + e.getMessage());
-            return "Não deu para deletar a tag, erro no service";
+            throw new RuntimeException("Erro no service, não deu para deletar a tag no repository: " + e.getMessage());
         }
     }
 
     public TagEntity findById(UUID uuid) {
-        return tagRepository.findById(uuid)
-                .orElseThrow(() -> new RuntimeException("Tag não encontrada no banco"));
+        return tagRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Tag não encontrada no banco"));
     }
 
 
@@ -55,7 +54,7 @@ public class TagService {
             return tagRepository.findAll();
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar as tags do banco: " + e.getMessage());
-            return List.of();
+            throw new RuntimeException("Erro no service, não deu para listar a tags no repository: " + e.getMessage());
         }
     }
 }

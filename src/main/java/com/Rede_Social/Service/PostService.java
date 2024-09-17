@@ -33,9 +33,9 @@ public class PostService {
 
     public PostEntity save(PostEntity post) {
         try {
-            UserEntity user = userRepository.findById(post.getUser().getUuid()).orElseThrow(() -> new UserNotFoundException("Erro ao achar usuario"));
+            UserEntity user = userRepository.findById(post.getUser().getUuid()).orElseThrow(() -> new UserNotFoundException());
 
-            List<UUID> tagsId = post.getTags().stream().map(TagEntity :: getUuid).toList();
+            List<UUID> tagsId = post.getTags().stream().map(TagEntity::getUuid).toList();
 
             List<TagEntity> tags = tagRepository.findAllById(tagsId);
 
@@ -48,9 +48,11 @@ public class PostService {
             post.setValido(geminiService.validadeAI(post.getConteudo()));
 
             return postRepository.save(post);
+        } catch (UserNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar o post no repository: " + e.getMessage());
-            return new PostEntity();
+            throw new RuntimeException("Erro no service, não deu para salvar o post no repository: " + e.getMessage());
         }
     }
 
@@ -61,7 +63,7 @@ public class PostService {
             return postRepository.save(post);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());
-            return new PostEntity();
+            throw new RuntimeException("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());
         }
     }
 
@@ -71,7 +73,7 @@ public class PostService {
             return "Post deletado";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para deletar o post no repository: " + e.getMessage());
-            return "Não deu para deletar o post, erro no service";
+            throw new RuntimeException("Erro no service, não deu para deletar o post no repository: " + e.getMessage());
         }
     }
 
@@ -84,7 +86,7 @@ public class PostService {
             return postRepository.findAll();
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
-            return List.of();
+            throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
         }
     }
 }

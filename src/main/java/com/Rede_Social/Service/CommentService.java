@@ -19,7 +19,7 @@ public class CommentService {
             return commentRepository.save(comment);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar o comentário no repository: " + e.getMessage());
-            return new CommentEntity();
+            throw new RuntimeException("Erro no service, não deu para salvar o comentário no repository: " + e.getMessage());
         }
     }
 
@@ -30,7 +30,7 @@ public class CommentService {
             return commentRepository.save(comment);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para atualizar o comentário no repository: " + e.getMessage());
-            return new CommentEntity();
+            throw new RuntimeException("Erro no service, não deu para atualizar o comentário no repository: " + e.getMessage());
         }
     }
 
@@ -40,17 +40,12 @@ public class CommentService {
             return "Comentário deletado";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para deletar o comentário no repository: " + e.getMessage());
-            return "Não deu para deletar o comentário, erro no service";
+            throw new RuntimeException("Erro no service, não deu para deletar o comentário no repository: " + e.getMessage());
         }
     }
 
     public CommentEntity findById(UUID uuid) {
-        try {
-            return commentRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Comentário não encontrado no banco"));
-        } catch (Exception e) {
-            System.out.println("Erro no service, não deu para encontrar o comentário no repository: " + e.getMessage());
-            return new CommentEntity();
-        }
+        return commentRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Comentário não encontrado no banco"));
     }
 
     public List<CommentEntity> findAll() {
@@ -58,7 +53,7 @@ public class CommentService {
             return commentRepository.findAll();
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os comentários do banco: " + e.getMessage());
-            return List.of();
+            throw new RuntimeException("Erro no service, não deu para listar os comentarios: " + e.getMessage());
         }
     }
 }

@@ -19,7 +19,7 @@ public class ComplaintService {
             return complaintRepository.save(complaint);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar a reclamação no repository: " + e.getMessage());
-            return new ComplaintEntity();
+            throw new RuntimeException("Erro no service, não deu para salvar a reclamação no repository: " + e.getMessage());
         }
     }
 
@@ -30,7 +30,7 @@ public class ComplaintService {
             return complaintRepository.save(complaint);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para atualizar a reclamação no repository: " + e.getMessage());
-            return new ComplaintEntity();
+            throw new RuntimeException("Erro no service, não deu para atualizar a reclamação no repository: " + e.getMessage());
         }
     }
 
@@ -40,17 +40,12 @@ public class ComplaintService {
             return "Reclamação deletada";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para deletar a reclamação no repository: " + e.getMessage());
-            return "Não deu para deletar a reclamação, erro no service";
+            throw new RuntimeException("Erro no service, não deu para deletar a reclamação no repository: " + e.getMessage());
         }
     }
 
     public ComplaintEntity findById(UUID uuid) {
-        try {
-            return complaintRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Reclamação não encontrada no banco"));
-        } catch (Exception e) {
-            System.out.println("Erro no service, não deu para encontrar a reclamação no repository: " + e.getMessage());
-            return new ComplaintEntity();
-        }
+        return complaintRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Reclamação não encontrada no banco"));
     }
 
     public List<ComplaintEntity> findAll() {
@@ -58,7 +53,7 @@ public class ComplaintService {
             return complaintRepository.findAll();
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar as reclamações do banco: " + e.getMessage());
-            return List.of();
+            throw new RuntimeException("Erro no service, não deu para listar as reclamacoes: " + e.getMessage());
         }
     }
 }

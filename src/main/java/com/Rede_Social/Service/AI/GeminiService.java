@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class GeminiService {
-    // commit teste
 
     @Value("${gemini.key}")
     private String GEMINI_KEY;
@@ -19,25 +18,9 @@ public class GeminiService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // só pra testes depois excluir essa fdunção
-    public String generateContent() {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
-        headers.set("x-goog-api-key", GEMINI_KEY);
-
-        String body = "{\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Give me five subcategories of punk?\"}]}]}";
-
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
-        ResponseEntity<String> response = restTemplate.exchange(GEMINI_URL, HttpMethod.POST, entity, String.class);
-
-        return response.getBody();
-    }
-
     public boolean validadeAI(String userInput) {
-        String prompt = "Sempre retorne apenas um dígito. Analise se a seguinte mensagem é ofensiva, caso seja, retorne 0, caso contrário retorne 1. " +
-                "Mensagem: " + userInput;
-        System.out.println(prompt);
+        String prompt = "Analise a seguinte mensagem e determine se é ofensiva. Se for ofensiva, retorne o número '0'. Se não for ofensiva, retorne o número '1'. Apenas um número deve ser retornado sem qualquer explicação adicional. Mensagem: " + userInput;
+        System.out.println("Prompt enviado: " + prompt);
         String jsonPayload = String.format("{\"contents\":[{\"role\": \"user\",\"parts\":[{\"text\": \"%s\"}]}]}", prompt);
 
         HttpHeaders headers = new HttpHeaders();
@@ -49,28 +32,55 @@ public class GeminiService {
         ResponseEntity<String> response = restTemplate.exchange(GEMINI_URL, HttpMethod.POST, requestEntity, String.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
+            System.out.println("Resposta recebida: " + response.getBody());
             String result = extractResponseFromJson(response.getBody());
 
-            // Verifica o retorno da API: "1" (não ofensivo) retorna true, "0" (ofensivo) retorna false
+            System.out.println("Resultado extraído: " + result);
+
             return "1".equals(result);
         } else {
             throw new RuntimeException("Failed to call API: " + response.getStatusCode());
         }
     }
 
+//    private String extractResponseFromJson(String responseBody) {
+//        try {
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            JsonNode rootNode = objectMapper.readTree(responseBody);
+//            JsonNode textNode = rootNode.path("candidates").get(0)
+//                    .path("content")
+//                    .path("parts").get(0)
+//                    .path("text");
+//
+//            return textNode.asText();
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to parse API response", e);
+//        }
+//    }
 
     private String extractResponseFromJson(String responseBody) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(responseBody);
-            JsonNode textNode = rootNode.path("candidates").get(0)
-                    .path("content")
-                    .path("parts").get(0)
-                    .path("text");
+            JsonNode candidatesNode = rootNode.path("candidates").get(0);
+            JsonNode safetyRatingsNode = candidatesNode.path("safetyRatings");
 
-            return textNode.asText();
+            // Verifica se há discurso de ódio ou assédio com probabilidade "MEDIUM" ou superior
+            for (JsonNode rating : safetyRatingsNode) {
+                String category = rating.path("category").asText();
+                String probability = rating.path("probability").asText();
+
+                if ((category.equals("HARM_CATEGORY_HATE_SPEECH") || category.equals("HARM_CATEGORY_HARASSMENT"))
+                        && (probability.equals("MEDIUM") || probability.equals("HIGH"))) {
+                    // Mensagem é ofensiva
+                    return "0";
+                }
+            }
+            // Caso não tenha encontrado nada ofensivo, retorna 1 (não ofensivo)
+            return "1";
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse API response", e);
         }
     }
+
 }

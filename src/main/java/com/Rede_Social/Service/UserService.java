@@ -30,18 +30,20 @@ public class UserService {
             return user;
         } catch (Exception e) {
             System.out.println("Erro no service, n deu para salvar o usuario no repository" + e.getMessage());
-            return new UserEntity();
+            throw new RuntimeException("Erro no service, n deu para salvar o usuario no repository" + e.getMessage());
         }
     }
 
     public UserEntity update(UserEntity user, UUID uuid) {
         try {
-            userRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Usuario n exixte no banco"));
+            userRepository.findById(uuid).orElseThrow(() -> new UserNotFoundException());
             user.setUuid(uuid);
             return userRepository.save(user);
+        } catch (UserNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             System.out.println("Erro no service, n deu para atualizar o usuario no repository" + e.getMessage());
-            return new UserEntity();
+            throw new RuntimeException("Erro no service, n deu para atualizar o usuario no repository " + e.getMessage());
         }
     }
 
@@ -51,7 +53,7 @@ public class UserService {
             return "usuario deletado";
         } catch (Exception e) {
             System.out.println("Erro no service, n deu para atualizar o usuario no repository" + e.getMessage());
-            return "N deu para deletar o suario, erro no service";
+            throw new RuntimeException("Erro no service, n deu para deletar o usuario no repository" + e.getMessage());
         }
     }
 
@@ -64,7 +66,7 @@ public class UserService {
             return userRepository.findAll();
         } catch (Exception e) {
             System.out.println("Erro no service, n deu para listar os usuarios do banco" + e.getMessage());
-            return List.of();
+            throw new RuntimeException("Erro no service, n deu para listar todos users " + e.getMessage());
         }
     }
 

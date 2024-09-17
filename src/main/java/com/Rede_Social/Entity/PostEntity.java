@@ -38,10 +38,6 @@ public class PostEntity {
     @JsonIgnoreProperties({"complaints", "likes", "comments", "posts", "senha"})
     private UserEntity user;
 
-    @OneToMany(mappedBy = "post")
-    @JsonIgnoreProperties("post")  // Evita loop infinito durante a serialização de LikeEntity
-    private List<LikeEntity> likes = new ArrayList<>();
-
     @ManyToMany
     @JoinTable(
             name = "post_tag",
@@ -52,9 +48,13 @@ public class PostEntity {
 
     @OneToMany(mappedBy = "post")
     @JsonIgnoreProperties("post")
+    private List<LikeEntity> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    @JsonIgnoreProperties("post")
     private List<CommentEntity> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    @JsonIgnoreProperties("post")  // Evita loop infinito durante a serialização de ComplaintEntity
+    @JsonIgnoreProperties("post")
     private List<ComplaintEntity> complaints = new ArrayList<>();
 }

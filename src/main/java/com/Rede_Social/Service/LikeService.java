@@ -19,7 +19,7 @@ public class LikeService {
             return likeRepository.save(like);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar o like no repository: " + e.getMessage());
-            return new LikeEntity();
+            throw new RuntimeException("Erro no service, não deu para salvar o like no repository: " + e.getMessage());
         }
     }
 
@@ -30,7 +30,7 @@ public class LikeService {
             return likeRepository.save(like);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para atualizar o like no repository: " + e.getMessage());
-            return new LikeEntity();
+            throw new RuntimeException("Erro no service, não deu para atualizar o like no repository: " + e.getMessage());
         }
     }
 
@@ -40,17 +40,12 @@ public class LikeService {
             return "Like deletado";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para deletar o like no repository: " + e.getMessage());
-            return "Não deu para deletar o like, erro no service";
+            throw new RuntimeException("Erro no service, não deu para deletar o like no repository: " + e.getMessage());
         }
     }
 
     public LikeEntity findById(UUID uuid) {
-        try {
-            return likeRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Like não encontrado no banco"));
-        } catch (Exception e) {
-            System.out.println("Erro no service, não deu para encontrar o like no repository: " + e.getMessage());
-            return new LikeEntity();
-        }
+        return likeRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Like não encontrado no banco"));
     }
 
     public List<LikeEntity> findAll() {
@@ -58,7 +53,7 @@ public class LikeService {
             return likeRepository.findAll();
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os likes do banco: " + e.getMessage());
-            return List.of();
+            throw new RuntimeException("Erro no service, não deu para listar os likes no repository: " + e.getMessage());
         }
     }
 }
