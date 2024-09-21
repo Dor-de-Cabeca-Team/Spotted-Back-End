@@ -56,4 +56,13 @@ public class PostController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PostMapping("/like-post")
+    public ResponseEntity<String> darLikePost(@RequestParam UUID idPost, @RequestParam UUID idUser){
+        try {
+            return ResponseEntity.ok(postService.darLikePost(idPost, idUser));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

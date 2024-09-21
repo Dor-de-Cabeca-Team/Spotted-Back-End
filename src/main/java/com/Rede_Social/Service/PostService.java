@@ -1,10 +1,12 @@
 package com.Rede_Social.Service;
 
+import com.Rede_Social.Entity.LikeEntity;
 import com.Rede_Social.Entity.PostEntity;
 import com.Rede_Social.Entity.TagEntity;
 import com.Rede_Social.Entity.UserEntity;
 import com.Rede_Social.Exception.Post.PostNotFoundException;
 import com.Rede_Social.Exception.User.UserNotFoundException;
+import com.Rede_Social.Repository.LikeRepository;
 import com.Rede_Social.Repository.PostRepository;
 import com.Rede_Social.Repository.TagRepository;
 import com.Rede_Social.Repository.UserRepository;
@@ -31,9 +33,12 @@ public class PostService {
     @Autowired
     private GeminiService geminiService;
 
+    @Autowired
+    private LikeRepository likeRepository;
+
     public PostEntity save(PostEntity post) {
         try {
-            UserEntity user = userRepository.findById(post.getUser().getUuid()).orElseThrow(() -> new UserNotFoundException());
+            UserEntity user = userRepository.findById(post.getUser().getUuid()).orElseThrow(UserNotFoundException::new);
 
             List<UUID> tagsId = post.getTags().stream().map(TagEntity::getUuid).toList();
 
@@ -78,7 +83,7 @@ public class PostService {
     }
 
     public PostEntity findById(UUID uuid) {
-        return postRepository.findById(uuid).orElseThrow(() -> new PostNotFoundException());
+        return postRepository.findById(uuid).orElseThrow(PostNotFoundException::new);
     }
 
     public List<PostEntity> findAll() {
@@ -87,6 +92,23 @@ public class PostService {
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
+        }
+    }
+
+    public String darLikePost(UUID idPost, UUID idUser) {
+        try {
+            PostEntity post = postRepository.findById(idPost).orElseThrow(PostNotFoundException::new);
+            UserEntity user = userRepository.findById(idUser).orElseThrow(UserNotFoundException::new);
+
+            LikeEntity like = new LikeEntity(UUID.randomUUID(), user, post, null);
+
+            likeRepository.save(like);
+
+            return "Like dado";
+        } catch (PostNotFoundException | UserNotFoundException e) {
+           throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Erro inesperado ao tentar dar like", e);
         }
     }
 }

@@ -6,8 +6,4 @@ public class PostNotFoundException extends RuntimeException {
         super("Post nao encontrado");
     }
 
-    public PostNotFoundException(String mensagem) {
-        super(mensagem);
-    }
-
 }
