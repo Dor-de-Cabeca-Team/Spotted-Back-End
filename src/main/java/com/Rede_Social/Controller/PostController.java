@@ -65,4 +65,32 @@ public class PostController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PostMapping("/like-comentario")
+    public ResponseEntity<String> darLikeComentario(@RequestParam UUID idComentario, @RequestParam UUID idUser){
+        try {
+            return ResponseEntity.ok(postService.darLikeComentario(idComentario, idUser));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/denunciar-post")
+    public ResponseEntity<String> denunciarPost(@RequestParam UUID idPost, @RequestParam UUID idUser){
+        try {
+            return ResponseEntity.ok(postService.denunciarPost(idPost, idUser));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/denunciar-comentario")
+    public ResponseEntity<String> denunciarComentario(@RequestParam UUID idComentario, @RequestParam UUID idUser){
+        try {
+            return ResponseEntity.ok(postService.denunciarComentario(idComentario, idUser));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 }

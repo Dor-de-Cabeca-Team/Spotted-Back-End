@@ -20,15 +20,20 @@ public class EmailEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID emailId;
+
     @NotNull
     private UUID ownerRef;
+
     @NotBlank
     private String emailFrom;
+
     @NotBlank
     @Email
     private String emailTo;
+
     @NotBlank
     private String subject;
+
     @NotBlank
     @Column(columnDefinition = "TEXT")
     private String text;
