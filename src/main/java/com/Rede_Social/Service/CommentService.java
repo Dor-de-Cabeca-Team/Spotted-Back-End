@@ -1,10 +1,18 @@
 package com.Rede_Social.Service;
 
 import com.Rede_Social.Entity.CommentEntity;
+import com.Rede_Social.Entity.PostEntity;
+import com.Rede_Social.Entity.UserEntity;
+import com.Rede_Social.Exception.Post.PostNotFoundException;
+import com.Rede_Social.Exception.User.UserNotFoundException;
 import com.Rede_Social.Repository.CommentRepository;
+import com.Rede_Social.Repository.PostRepository;
+import com.Rede_Social.Repository.UserRepository;
+import com.Rede_Social.Service.AI.GeminiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,9 +22,25 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public CommentEntity save(CommentEntity comment) {
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
+    private GeminiService geminiService;
+
+    public CommentEntity save(UUID idPost, UUID idUser, String conteudo) {
         try {
-            return commentRepository.save(comment);
+            UserEntity user = userRepository.findById(idUser).orElseThrow(UserNotFoundException::new);
+            PostEntity post = postRepository.findById(idPost).orElseThrow(PostNotFoundException::new);
+
+            boolean valido = geminiService.validadeAI(conteudo);
+
+            CommentEntity comentario = new CommentEntity(UUID.randomUUID(), Instant.now(), conteudo, valido, null, null, user, post);
+
+            return commentRepository.save(comentario);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar o comentário no repository: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para salvar o comentário no repository: " + e.getMessage());

@@ -16,38 +16,39 @@ import java.util.List;
 import java.util.UUID;
 
 @Setter
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Entity(name = "comment")
-    @Table(name = "comment")
-    public class CommentEntity {
-        @Id
-        @GeneratedValue(strategy = GenerationType.UUID)
-        private UUID uuid;
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity(name = "comment")
+@Table(name = "comment")
 
-        private Instant data;
+public class CommentEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID uuid;
 
-        @NotBlank @NotNull @NotEmpty
-        private String conteudo;
+    private Instant data;
 
-        private boolean valido;
+    @NotBlank @NotNull @NotEmpty
+    private String conteudo;
 
-        @OneToMany(mappedBy = "comment")
-        @JsonIgnoreProperties("comment")  // Evita loop infinito durante a serialização de ComplaintEntity
-        private List<ComplaintEntity> complaints = new ArrayList<>();
+    private boolean valido;
 
-        @OneToMany(mappedBy = "comment")
-        @JsonIgnoreProperties("comment")  // Evita loop infinito durante a serialização de LikeEntity
-        private List<LikeEntity> likes = new ArrayList<>();
+    @OneToMany(mappedBy = "comment")
+    @JsonIgnoreProperties("comment")  // Evita loop infinito durante a serialização de ComplaintEntity
+    private List<ComplaintEntity> complaints = new ArrayList<>();
 
-        @ManyToOne
-        @JoinColumn(name = "user_id")
-        @JsonIgnoreProperties("comments")
-        private UserEntity user;
+    @OneToMany(mappedBy = "comment")
+    @JsonIgnoreProperties("comment")  // Evita loop infinito durante a serialização de LikeEntity
+    private List<LikeEntity> likes = new ArrayList<>();
 
-        @ManyToOne
-        @JoinColumn(name = "post_id")
-        @JsonIgnoreProperties("comments")
-        private PostEntity post;
-    }
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties("comments")
+    private UserEntity user;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    @JsonIgnoreProperties("comments")
+    private PostEntity post;
+}
