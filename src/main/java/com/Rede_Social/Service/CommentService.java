@@ -31,14 +31,14 @@ public class CommentService {
     @Autowired
     private GeminiService geminiService;
 
-    public CommentEntity save(UUID idPost, UUID idUser, String conteudo) {
+    public CommentEntity save(UUID idPost, UUID idUser, CommentEntity comment) {
         try {
             UserEntity user = userRepository.findById(idUser).orElseThrow(UserNotFoundException::new);
             PostEntity post = postRepository.findById(idPost).orElseThrow(PostNotFoundException::new);
 
-            boolean valido = geminiService.validadeAI(conteudo);
+            boolean valido = geminiService.validadeAI(comment.getConteudo());
 
-            CommentEntity comentario = new CommentEntity(UUID.randomUUID(), Instant.now(), conteudo, valido, null, null, user, post);
+            CommentEntity comentario = new CommentEntity(UUID.randomUUID(), Instant.now(), comment.getConteudo(), valido, null, null, user, post);
 
             return commentRepository.save(comentario);
         } catch (Exception e) {
@@ -69,7 +69,12 @@ public class CommentService {
     }
 
     public CommentEntity findById(UUID uuid) {
-        return commentRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Comentário não encontrado no banco"));
+        try {
+            return commentRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Comentário não encontrado no banco"));
+        }catch(Exception e){
+            System.out.println("Erro no service, não foi possível encontrar o comentário: "+ e.getMessage());
+            return new CommentEntity();
+        }
     }
 
     public List<CommentEntity> findAll() {
