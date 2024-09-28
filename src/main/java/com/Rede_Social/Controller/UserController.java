@@ -45,7 +45,11 @@ public class UserController {
 
     @GetMapping("/findById")
     public ResponseEntity<UserEntity> findById(@RequestParam UUID uuid) {
+        try {
             return ResponseEntity.ok(userService.findById(uuid));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/findAll")

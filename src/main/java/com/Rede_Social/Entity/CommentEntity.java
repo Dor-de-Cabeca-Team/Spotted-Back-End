@@ -21,7 +21,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity(name = "comment")
 @Table(name = "comment")
-
 public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -1,48 +1,111 @@
 package com.Rede_Social.Controller;
 
 import com.Rede_Social.Entity.CommentEntity;
-import com.Rede_Social.Service.CommentService;
+import com.Rede_Social.Entity.PostEntity;
+import com.Rede_Social.Entity.UserEntity;
+import com.Rede_Social.Repository.CommentRepository;
+import com.Rede_Social.Repository.PostRepository;
+import com.Rede_Social.Repository.UserRepository;
+import com.Rede_Social.Service.AI.GeminiService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 class CommentControllerTest {
-
     @Autowired
     CommentController commentController;
     @MockBean
-    CommentService commentService;
+    CommentRepository commentRepository;
+    @MockBean
+    UserRepository userRepository;
+    @MockBean
+    PostRepository postRepository;
+    @MockBean
+    GeminiService geminiService;
 
     @Test
     void saveSuccess() {
         UUID postId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
-        String conteudo = "Este é um comentário de teste.";
-        CommentEntity comment = new CommentEntity();
-        comment.setUuid(UUID.randomUUID());
-        comment.setConteudo(conteudo);
-        comment.setValido(true);
-        comment.setData(Instant.now());
+        String conteudo = "Comentário teste";
 
-        when(commentService.save(postId, userId, comment)).thenReturn(comment);
+        UserEntity user = new UserEntity();
+        user.setUuid(userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        ResponseEntity<CommentEntity> response = commentController.save(postId, userId, comment);
+        PostEntity post = new PostEntity();
+        post.setUuid(postId);
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
+        when(geminiService.validadeAI(conteudo)).thenReturn(true);
+
+        CommentEntity savedComment = new CommentEntity();
+        savedComment.setUuid(UUID.randomUUID());
+        savedComment.setData(Instant.now());
+        savedComment.setConteudo(conteudo);
+        savedComment.setValido(true);
+        savedComment.setUser(user);
+        savedComment.setPost(post);
+
+        when(commentRepository.save(any(CommentEntity.class))).thenReturn(savedComment);
+
+        ResponseEntity<CommentEntity> response = commentController.save(postId, userId, conteudo);
+
+        assertNotNull(response, "A resposta não deve ser nula");
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(conteudo, response.getBody().getConteudo());
         assertTrue(response.getBody().isValido());
+        assertEquals(userId, response.getBody().getUser().getUuid());
+        assertEquals(postId, response.getBody().getPost().getUuid());
+    }
+
+    @Test
+    void savePostNotFound() {
+        UUID postId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        String conteudo = "Comentário teste";
+
+        UserEntity user = new UserEntity();
+        user.setUuid(userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        when(postRepository.findById(postId)).thenThrow(new RuntimeException());
+
+        ResponseEntity<CommentEntity> response = commentController.save(postId, userId, conteudo);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void saveUserNotFound() {
+        UUID postId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        String conteudo = "Comentário teste";
+
+        UserEntity user = new UserEntity();
+        user.setUuid(userId);
+        when(userRepository.findById(userId)).thenThrow(new RuntimeException());
+
+        ResponseEntity<CommentEntity> response = commentController.save(postId, userId, conteudo);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
@@ -53,9 +116,9 @@ class CommentControllerTest {
         String conteudo = "Comentário teste";
         comment.setConteudo(conteudo);
 
-        when(commentService.save(postId, userId, comment)).thenThrow(new RuntimeException());
+        when(commentRepository.save(comment)).thenThrow(new RuntimeException());
 
-        ResponseEntity<CommentEntity> retorno = commentController.save(postId, userId, comment);
+        ResponseEntity<CommentEntity> retorno = commentController.save(postId, userId, conteudo);
 
         assertEquals(HttpStatus.BAD_REQUEST, retorno.getStatusCode());
     }
@@ -71,7 +134,8 @@ class CommentControllerTest {
         comment.setValido(true);
         comment.setData(Instant.now());
 
-        when(commentService.update(comment, commentId)).thenReturn(comment);
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+        when(commentRepository.save(comment)).thenReturn(comment);
 
         ResponseEntity<CommentEntity> response = commentController.update(comment, commentId);
 
@@ -91,7 +155,8 @@ class CommentControllerTest {
         comment.setValido(true);
         comment.setData(Instant.now());
 
-        when(commentService.update(comment, commentId)).thenThrow(new RuntimeException());
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+        when(commentRepository.save(comment)).thenThrow(new RuntimeException());
 
         ResponseEntity<CommentEntity> response = commentController.update(comment, commentId);
 
@@ -101,21 +166,20 @@ class CommentControllerTest {
     @Test
     void deleteSuccess() {
         UUID commentId = UUID.randomUUID();
-        String expectedResponse = "Comentário deletado com sucesso";
 
-        when(commentService.delete(commentId)).thenReturn(expectedResponse);
+        doNothing().when(commentRepository).deleteById(commentId);
 
         ResponseEntity<String> response = commentController.delete(commentId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedResponse, response.getBody());
+        assertEquals("Comentário deletado", response.getBody());
     }
 
     @Test
     void deleteFailure() {
         UUID commentId = UUID.randomUUID();
 
-        when(commentService.delete(commentId)).thenThrow(new RuntimeException());
+        Mockito.doThrow(new RuntimeException()).when(commentRepository).deleteById(commentId);
 
         ResponseEntity<String> response = commentController.delete(commentId);
 
@@ -132,7 +196,7 @@ class CommentControllerTest {
         comment.setValido(true);
         comment.setData(Instant.now());
 
-        when(commentService.findById(commentId)).thenReturn(comment);
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
 
         ResponseEntity<CommentEntity> response = commentController.findById(commentId);
 
@@ -145,7 +209,7 @@ class CommentControllerTest {
     void findByIdFailure() {
         UUID commentId = UUID.randomUUID();
 
-        when(commentService.findById(commentId)).thenThrow(new RuntimeException());
+        when(commentRepository.findById(commentId)).thenThrow(new RuntimeException());
 
         ResponseEntity<CommentEntity> response = commentController.findById(commentId);
 
@@ -168,7 +232,7 @@ class CommentControllerTest {
 
         List<CommentEntity> comments = Arrays.asList(comment1, comment2);
 
-        when(commentService.findAll()).thenReturn(comments);
+        when(commentRepository.findAll()).thenReturn(comments);
 
         ResponseEntity<List<CommentEntity>> response = commentController.findAll();
 
@@ -178,7 +242,7 @@ class CommentControllerTest {
 
     @Test
     void findAllFailure() {
-        when(commentService.findAll()).thenThrow(new RuntimeException());
+        when(commentRepository.findAll()).thenThrow(new RuntimeException());
 
         ResponseEntity<List<CommentEntity>> response = commentController.findAll();
 

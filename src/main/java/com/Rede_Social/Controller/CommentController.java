@@ -19,7 +19,7 @@ public class CommentController {
     @PostMapping("/save")
     public ResponseEntity<CommentEntity> save(@RequestParam UUID idPost,
                                               @RequestParam UUID idUser,
-                                              @RequestBody CommentEntity comment) {
+                                              @RequestBody String comment) {
         try {
             return ResponseEntity.ok(commentService.save(idPost, idUser, comment));
         } catch (Exception e) {

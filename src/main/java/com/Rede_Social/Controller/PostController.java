@@ -45,7 +45,11 @@ public class PostController {
 
     @GetMapping("/findById")
     public ResponseEntity<PostEntity> findById(@RequestParam UUID uuid) {
+        try {
             return ResponseEntity.ok(postService.findById(uuid));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/findAll")

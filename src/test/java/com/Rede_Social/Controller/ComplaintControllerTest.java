@@ -1,8 +1,10 @@
 package com.Rede_Social.Controller;
 
 import com.Rede_Social.Entity.ComplaintEntity;
+import com.Rede_Social.Repository.ComplaintRepository;
 import com.Rede_Social.Service.ComplaintService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -11,9 +13,11 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -22,12 +26,12 @@ class ComplaintControllerTest {
     ComplaintController complaintController;
 
     @MockBean
-    ComplaintService complaintService;
+    ComplaintRepository complaintRepository;
 
     @Test
     void saveSuccess() {
         ComplaintEntity complaint = new ComplaintEntity();
-        when(complaintService.save(complaint)).thenReturn(complaint);
+        when(complaintRepository.save(complaint)).thenReturn(complaint);
 
         ResponseEntity<ComplaintEntity> response = complaintController.save(complaint);
 
@@ -39,7 +43,7 @@ class ComplaintControllerTest {
     void saveFailure() {
         ComplaintEntity complaint = new ComplaintEntity();
 
-        when(complaintService.save(complaint)).thenThrow(new RuntimeException());
+        when(complaintRepository.save(complaint)).thenThrow(new RuntimeException());
 
         ResponseEntity<ComplaintEntity> response = complaintController.save(complaint);
 
@@ -51,7 +55,8 @@ class ComplaintControllerTest {
         UUID uuid = UUID.randomUUID();
         ComplaintEntity complaint = new ComplaintEntity();
 
-        when(complaintService.update(complaint, uuid)).thenReturn(complaint);
+        when(complaintRepository.findById(uuid)).thenReturn(Optional.of(complaint));
+        when(complaintRepository.save(complaint)).thenReturn(complaint);
 
         ResponseEntity<ComplaintEntity> response = complaintController.update(complaint, uuid);
 
@@ -64,7 +69,8 @@ class ComplaintControllerTest {
         UUID uuid = UUID.randomUUID();
         ComplaintEntity complaint = new ComplaintEntity();
 
-        when(complaintService.update(complaint, uuid)).thenThrow(new RuntimeException());
+        when(complaintRepository.findById(uuid)).thenReturn(Optional.of(complaint));
+        when(complaintRepository.save(complaint)).thenThrow(new RuntimeException());
 
         ResponseEntity<ComplaintEntity> response = complaintController.update(complaint, uuid);
 
@@ -74,18 +80,18 @@ class ComplaintControllerTest {
     @Test
     void deleteSuccess() {
         UUID uuid = UUID.randomUUID();
-        when(complaintService.delete(uuid)).thenReturn("Complaint deleted");
+        doNothing().when(complaintRepository).deleteById(uuid);
 
         ResponseEntity<String> response = complaintController.delete(uuid);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Complaint deleted", response.getBody());
+        assertEquals("Reclamação deletada", response.getBody());
     }
 
     @Test
     void deleteFailure() {
         UUID uuid = UUID.randomUUID();
-        when(complaintService.delete(uuid)).thenThrow(new RuntimeException());
+        Mockito.doThrow(new RuntimeException()).when(complaintRepository).deleteById(uuid);
 
         ResponseEntity<String> response = complaintController.delete(uuid);
 
@@ -97,7 +103,7 @@ class ComplaintControllerTest {
         UUID uuid = UUID.randomUUID();
         ComplaintEntity complaint = new ComplaintEntity();
 
-        when(complaintService.findById(uuid)).thenReturn(complaint);
+        when(complaintRepository.findById(uuid)).thenReturn(Optional.of(complaint));
 
         ResponseEntity<ComplaintEntity> response = complaintController.findById(uuid);
 
@@ -108,9 +114,8 @@ class ComplaintControllerTest {
     @Test
     void findByIdFailure() {
         UUID uuid = UUID.randomUUID();
-        ComplaintEntity complaint = new ComplaintEntity();
 
-        when(complaintService.findById(uuid)).thenThrow(new RuntimeException());
+        when(complaintRepository.findById(uuid)).thenReturn(Optional.empty());
 
         ResponseEntity<ComplaintEntity> response = complaintController.findById(uuid);
 
@@ -123,7 +128,7 @@ class ComplaintControllerTest {
         ComplaintEntity complaint = new ComplaintEntity();
         complaints.add(complaint);
 
-        when(complaintService.findAll()).thenReturn(complaints);
+        when(complaintRepository.findAll()).thenReturn(complaints);
 
         ResponseEntity<List<ComplaintEntity>> response = complaintController.findAll();
 
@@ -135,7 +140,7 @@ class ComplaintControllerTest {
 
     @Test
     void findAllFailure() {
-        when(complaintService.findAll()).thenThrow(new RuntimeException());
+        when(complaintRepository.findAll()).thenThrow(new RuntimeException());
 
         ResponseEntity<List<ComplaintEntity>> response = complaintController.findAll();
 
