@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/comment")
+@RequestMapping("/api/comment")//request
 public class CommentController {
 
     @Autowired
