@@ -1,11 +1,9 @@
 package com.Rede_Social.Controller;
 
-import com.Rede_Social.Entity.CommentEntity;
-import com.Rede_Social.Entity.LikeEntity;
-import com.Rede_Social.Entity.PostEntity;
-import com.Rede_Social.Entity.UserEntity;
+import com.Rede_Social.Entity.*;
 import com.Rede_Social.Repository.*;
 import com.Rede_Social.Service.AI.GeminiService;
+import com.Rede_Social.Service.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,9 +33,6 @@ class PostControllerTest {
     TagRepository tagRepository;
 
     @MockBean
-    GeminiService geminiService;
-
-    @MockBean
     LikeRepository likeRepository;
 
     @MockBean
@@ -47,23 +42,30 @@ class PostControllerTest {
     CommentRepository commentRepository;
 
 
-//    @Test
-//    void saveSuccess() {
-//        UserEntity user = new UserEntity();
-//        user.setUuid(UUID.randomUUID());
-//
-//        PostEntity post = new PostEntity();
-//        post.setUuid(UUID.randomUUID());
-//        post.setUser(user);
-//
-//        when(tagRepository.findAllById()).thenReturn(tags);
-//        when(postRepository.save(post)).thenReturn(post);
-//
-//        ResponseEntity<PostEntity> response = postController.save(post);
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(post, response.getBody());
-//    }
+    @Test
+    void saveSuccess() {
+        UUID userId = UUID.randomUUID();
+        UserEntity user = new UserEntity();
+        user.setUuid(userId);
+        user.setNome("Test User");
+        UUID tagId = UUID.randomUUID();
+        TagEntity tag = new TagEntity();
+        tag.setUuid(tagId);
+        tag.setNome("Test Tag");
+        PostEntity post = new PostEntity();
+        post.setUser(user);
+        post.setConteudo("Conteúdo de Teste");
+        post.setTags(List.of(tag));
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(tagRepository.findAllById(anyList())).thenReturn(List.of(tag));
+        when(postRepository.save(any(PostEntity.class))).thenReturn(post);
+
+        ResponseEntity<PostEntity> response = postController.save(post);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(post, response.getBody());
+    }
 
     @Test
     void saveFailure() {
@@ -221,72 +223,88 @@ class PostControllerTest {
         assertEquals(responseMessage, response.getBody());
     }
 
-//    @Test
-//    void darLikeComentarioFailure() {
-//        UUID idComentario = UUID.randomUUID();
-//        UUID idUser = UUID.randomUUID();
-//
-//        // Mock para simular uma exceção no repositório de Likes
-//        when(likeRepository.darLikeComentario(idComentario, idUser)).thenThrow(new RuntimeException());
-//
-//        ResponseEntity<String> response = postController.darLikeComentario(idComentario, idUser);
-//
-//        assertEquals(400, response.getStatusCodeValue());
-//    }
-//
-//    @Test
-//    void denunciarPostSuccess() {
-//        UUID idPost = UUID.randomUUID();
-//        UUID idUser = UUID.randomUUID();
-//        String responseMessage = "Denuncia ao post feita";
-//
-//        // Mock para o método do repositório de Denúncias
-//        when(complaintRepository.denunciarPost(idPost, idUser)).thenReturn(responseMessage);
-//
-//        ResponseEntity<String> response = postController.denunciarPost(idPost, idUser);
-//
-//        assertEquals(200, response.getStatusCodeValue());
-//        assertEquals(responseMessage, response.getBody());
-//    }
-//
-//    @Test
-//    void denunciarPostFailure() {
-//        UUID idPost = UUID.randomUUID();
-//        UUID idUser = UUID.randomUUID();
-//
-//        // Mock para simular uma exceção no repositório de Denúncias
-//        when(complaintRepository.denunciarPost(idPost, idUser)).thenThrow(new RuntimeException());
-//
-//        ResponseEntity<String> response = postController.denunciarPost(idPost, idUser);
-//
-//        assertEquals(400, response.getStatusCodeValue());
-//    }
-//
-//    @Test
-//    void denunciarComentarioSuccess() {
-//        UUID idComentario = UUID.randomUUID();
-//        UUID idUser = UUID.randomUUID();
-//        String responseMessage = "Denuncia ao comentario feita";
-//
-//        // Mock para o método do repositório de Denúncias
-//        when(complaintRepository.denunciarComentario(idComentario, idUser)).thenReturn(responseMessage);
-//
-//        ResponseEntity<String> response = postController.denunciarComentario(idComentario, idUser);
-//
-//        assertEquals(200, response.getStatusCodeValue());
-//        assertEquals(responseMessage, response.getBody());
-//    }
-//
-//    @Test
-//    void denunciarComentarioFailure() {
-//        UUID idComentario = UUID.randomUUID();
-//        UUID idUser = UUID.randomUUID();
-//
-//        // Mock para simular uma exceção no repositório de Denúncias
-//        when(complaintRepository.denunciarComentario(idComentario, idUser)).thenThrow(new RuntimeException());
-//
-//        ResponseEntity<String> response = postController.denunciarComentario(idComentario, idUser);
-//
-//        assertEquals(400, response.getStatusCodeValue());
-//    }
+    @Test
+    void darLikeComentarioFailure() {
+        UUID idComentario = UUID.randomUUID();
+        UUID idUser = UUID.randomUUID();
+
+        when(commentRepository.findById(idComentario)).thenReturn(Optional.empty());
+
+        ResponseEntity<String> response = postController.darLikeComentario(idComentario, idUser);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void denunciarPostSuccess() {
+        UUID idPost = UUID.randomUUID();
+        UUID idUser = UUID.randomUUID();
+        UserEntity user = new UserEntity();
+        user.setUuid(idUser);
+        PostEntity post = new PostEntity();
+        post.setUuid(idPost);
+        ComplaintEntity complaint = new ComplaintEntity();
+        String responseMessage = "Denuncia ao post feita";
+
+        when(postRepository.findById(idPost)).thenReturn(Optional.of(post));
+        when(userRepository.findById(idUser)).thenReturn(Optional.of(user));
+        when(complaintRepository.save(complaint)).thenReturn(complaint);
+
+        ResponseEntity<String> response = postController.denunciarPost(idPost, idUser);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(responseMessage, response.getBody());
+    }
+
+    @Test
+    void denunciarPostFailure() {
+        UUID idPost = UUID.randomUUID();
+        UUID idUser = UUID.randomUUID();
+        UserEntity user = new UserEntity();
+        user.setUuid(idUser);
+        PostEntity post = new PostEntity();
+        post.setUuid(idPost);
+
+        when(postRepository.findById(idPost)).thenReturn(Optional.of(post));
+        when(userRepository.findById(idUser)).thenThrow(new RuntimeException());
+
+        ResponseEntity<String> response = postController.denunciarPost(idPost, idUser);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void denunciarComentarioSuccess() {
+        UUID idComment = UUID.randomUUID();
+        UUID idUser = UUID.randomUUID();
+        CommentEntity comment = new CommentEntity();
+        comment.setUuid(idComment);
+        UserEntity user = new UserEntity();
+        user.setUuid(idUser);
+        ComplaintEntity complaint = new ComplaintEntity();
+        String responseMessage = "Denuncia ao comentario feita";
+
+        when(commentRepository.findById(idComment)).thenReturn(Optional.of(comment));
+        when(userRepository.findById(idUser)).thenReturn(Optional.of(user));
+        when(complaintRepository.save(complaint)).thenReturn(complaint);
+
+        ResponseEntity<String> response = postController.denunciarComentario(idComment, idUser);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(responseMessage, response.getBody());
+    }
+
+    @Test
+    void denunciarComentarioFailure() {
+        UUID idComment = UUID.randomUUID();
+        UUID idUser = UUID.randomUUID();
+        CommentEntity comment = new CommentEntity();
+        comment.setUuid(idComment);
+
+        when(commentRepository.findById(idComment)).thenThrow(new RuntimeException());
+
+        ResponseEntity<String> response = postController.denunciarComentario(idComment, idUser);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
 }
