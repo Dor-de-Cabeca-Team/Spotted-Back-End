@@ -16,7 +16,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 
-
 @Service
 public class EmailService {
 
@@ -56,7 +55,7 @@ public class EmailService {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(emailEntity.getEmailFrom());
-            message.setTo(emailEntity.getEmailTo());
+            message.setTo(emailEntity.getEmailTo().split("\\s*,\\s*"));
             message.setSubject(emailEntity.getSubject());
             message.setText(emailEntity.getText());
             mailSender.send(message);

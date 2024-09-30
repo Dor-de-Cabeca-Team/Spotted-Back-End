@@ -63,6 +63,11 @@ public class GeminiService {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(responseBody);
             JsonNode candidatesNode = rootNode.path("candidates").get(0);
+            JsonNode contentNode = candidatesNode.path("content");
+            JsonNode textNode = contentNode.path("parts").get(0).path("text");
+
+            String result = textNode.asText();
+
             JsonNode safetyRatingsNode = candidatesNode.path("safetyRatings");
 
             // Verifica se há discurso de ódio ou assédio com probabilidade "MEDIUM" ou superior
@@ -76,8 +81,8 @@ public class GeminiService {
                     return "0";
                 }
             }
-            // Caso não tenha encontrado nada ofensivo, retorna 1 (não ofensivo)
-            return "1";
+            // Retorna o resultado do modelo, a menos que tenha sido considerado ofensivo
+            return result;
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse API response", e);
         }
