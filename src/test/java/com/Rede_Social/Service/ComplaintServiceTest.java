@@ -24,16 +24,16 @@ public class ComplaintServiceTest {
     @MockBean
     ComplaintRepository complaintRepository;
 
-//    @Test
-//    public void testSave_Success() {
-//        ComplaintEntity complaint = new ComplaintEntity();
-//        when(complaintRepository.save(any(ComplaintEntity.class))).thenReturn(complaint);
-//
-//        ComplaintEntity result = complaintService.save(complaint);
-//
-//        assertNotNull(result);
-//        verify(complaintRepository, times(1)).save(complaint);
-//    }
+    @Test
+    public void testSave_Success() {
+        ComplaintEntity complaint = new ComplaintEntity();
+        when(complaintRepository.save(any(ComplaintEntity.class))).thenReturn(complaint);
+
+        ComplaintEntity result = complaintService.save(complaint);
+
+        assertNotNull(result);
+        verify(complaintRepository, times(1)).save(complaint);
+    }
 
     @Test
     public void testSave_Exception() {
