@@ -25,17 +25,17 @@ public class ComplaintEntity {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties("complaints")  // Evita loop infinito durante a serialização de UserEntity
+    @JsonIgnoreProperties({"complaints", "likes", "posts", "comments" })  // Evita loop infinito durante a serialização de UserEntity
     private UserEntity user;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "post_id")
-    @JsonIgnoreProperties("complaints")  // Evita loop infinito durante a serialização de PostEntity
+    @JsonIgnoreProperties({"complaints", "likes", "user", "comments" , "tags"})  // Evita loop infinito durante a serialização de PostEntity
     private PostEntity post;
 
     @ManyToOne
     @JoinColumn(name = "comment_id", nullable = true)
-    @JsonIgnoreProperties("complaints")  // Evita loop infinito durante a serialização de CommentEntity
+    @JsonIgnoreProperties({"complaints", "likes", "user","post", "comments" , "tags"})  // Evita loop infinito durante a serialização de CommentEntity
     private CommentEntity comment;
 }

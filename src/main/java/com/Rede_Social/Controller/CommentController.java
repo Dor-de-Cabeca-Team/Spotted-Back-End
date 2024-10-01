@@ -17,15 +17,14 @@ public class CommentController {
     private CommentService commentService;
 
     @PostMapping("/save")
-    public ResponseEntity<CommentEntity> save(@RequestParam UUID idPost,
-                                              @RequestParam UUID idUser,
-                                              @RequestBody String comment) {
+    public ResponseEntity<CommentEntity> save(@RequestBody CommentEntity comment) {
         try {
-            return ResponseEntity.ok(commentService.save(idPost, idUser, comment));
+            return ResponseEntity.ok(commentService.save(comment));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
+
 
     @PutMapping("/update")
     public ResponseEntity<CommentEntity> update(@RequestBody CommentEntity comment, @RequestParam UUID uuid) {

@@ -97,4 +97,13 @@ public class PostController {
         }
     }
 
+    @GetMapping("/findTags")
+    public ResponseEntity<List<PostEntity>> findPostByTag(@RequestParam String tag){
+        try {
+            return ResponseEntity.ok(postService.findByTagsNome(tag));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 }

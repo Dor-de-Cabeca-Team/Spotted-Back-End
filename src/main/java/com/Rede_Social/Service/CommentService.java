@@ -31,20 +31,18 @@ public class CommentService {
     @Autowired
     private GeminiService geminiService;
 
-    public CommentEntity save(UUID idPost, UUID idUser, String comment) {
+    public CommentEntity save(CommentEntity comment) {
         try {
-            UserEntity user = userRepository.findById(idUser).orElseThrow(UserNotFoundException::new);
-            PostEntity post = postRepository.findById(idPost).orElseThrow(PostNotFoundException::new);
+            UserEntity user = userRepository.findById(comment.getUser().getUuid()).orElseThrow(UserNotFoundException::new);
+            PostEntity post = postRepository.findById(comment.getPost().getUuid()).orElseThrow(PostNotFoundException::new);
 
-            boolean valido = geminiService.validadeAI(comment);
+            System.out.println(comment);
+            comment.setValido(geminiService.validadeAI(comment.getConteudo()));
 
-            CommentEntity comentario = new CommentEntity(UUID.randomUUID(), Instant.now(), comment, valido, null, null, user, post);
-
-            if (comentario == null) {
-                System.out.println("Comentário é nulo antes de salvar!");
-            }
-
-            return commentRepository.save(comentario);
+            comment.setData(Instant.now());
+comment.setUser(user);
+comment.setPost(post);
+            return commentRepository.save(comment);
 
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar o comentário no repository: " + e.getMessage());

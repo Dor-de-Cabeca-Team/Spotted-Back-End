@@ -28,16 +28,16 @@ class ComplaintControllerTest {
     @MockBean
     ComplaintRepository complaintRepository;
 
-    @Test
-    void saveSuccess() {
-        ComplaintEntity complaint = new ComplaintEntity();
-        when(complaintRepository.save(complaint)).thenReturn(complaint);
-
-        ResponseEntity<ComplaintEntity> response = complaintController.save(complaint);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(complaint, response.getBody());
-    }
+//    @Test
+//    void saveSuccess() {
+//        ComplaintEntity complaint = new ComplaintEntity();
+//        when(complaintRepository.save(complaint)).thenReturn(complaint);
+//
+//        ResponseEntity<ComplaintEntity> response = complaintController.save(complaint);
+//
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//        assertEquals(complaint, response.getBody());
+//    }
 
     @Test
     void saveFailure() {

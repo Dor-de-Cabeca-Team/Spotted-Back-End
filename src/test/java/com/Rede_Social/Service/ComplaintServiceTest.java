@@ -25,7 +25,7 @@ public class ComplaintServiceTest {
     ComplaintRepository complaintRepository;
 
     @Test
-    public void testSave_Success() {//comentario para aparecer como colaborador
+    public void testSave_Success() {
         ComplaintEntity complaint = new ComplaintEntity();
         when(complaintRepository.save(any(ComplaintEntity.class))).thenReturn(complaint);
 
