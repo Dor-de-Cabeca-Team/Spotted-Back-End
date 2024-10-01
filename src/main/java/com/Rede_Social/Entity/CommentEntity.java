@@ -43,11 +43,11 @@ public class CommentEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties("comments")
+    @JsonIgnoreProperties({"comments", "posts", "likes", "complaints"})
     private UserEntity user;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
-    @JsonIgnoreProperties("comments")
+    @JsonIgnoreProperties({"user", "tags","likes", "complaints", "comments"})
     private PostEntity post;
 }

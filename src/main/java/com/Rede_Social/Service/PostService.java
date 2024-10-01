@@ -163,4 +163,11 @@ public class PostService {
         }
     }
 
+    public List<PostEntity> findByTagsNome(String tag){
+        try {
+            return postRepository.findByTagsNome(tag);
+        } catch (Exception e){
+            throw e;
+        }
+    }
 }
