@@ -106,4 +106,12 @@ public class PostController {
         }
     }
 
+    @GetMapping("/maisCurtidoDaSemana")
+    public ResponseEntity<PostEntity> postMaisCurtidoDaSemana(){
+        try{
+            return ResponseEntity.ok(postService.postMaisCurtidoDaSemana());
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

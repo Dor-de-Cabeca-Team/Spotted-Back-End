@@ -170,4 +170,12 @@ public class PostService {
             throw e;
         }
     }
+
+    public PostEntity postMaisCurtidoDaSemana(){
+        try{
+            return postRepository.findByMaisCurtido();
+        }catch (Exception e){
+            throw new RuntimeException("Erro ao buscar o post mais curtido da semana: " + e.getMessage());
+        }
+    }
 }
