@@ -107,4 +107,13 @@ public class PostController {
         }
     }
 
+    @GetMapping("/top10PostsComLike")
+    public ResponseEntity<List<PostEntity>> Top10PostsComLike() {
+        try {
+            return ResponseEntity.ok(postService.Top10PostsComLike());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 }
