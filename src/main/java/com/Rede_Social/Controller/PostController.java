@@ -1,6 +1,8 @@
 package com.Rede_Social.Controller;
 
+import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Entity.PostEntity;
+import com.Rede_Social.Service.CommentService;
 import com.Rede_Social.Service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,8 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+    @Autowired
+    private CommentService commentService;
 
     @PostMapping("/save")
     public ResponseEntity<PostEntity> save(@RequestBody PostEntity post) {
