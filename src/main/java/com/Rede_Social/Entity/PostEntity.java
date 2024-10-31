@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Setter
 @Getter
@@ -32,6 +33,12 @@ public class PostEntity {
     private String conteudo;
 
     private boolean valido;
+
+    private Integer profileAnimal;
+    @PrePersist
+    private void assignRandomProfileAnimal() {
+        this.profileAnimal = ThreadLocalRandom.current().nextInt(1, 21);
+    }
 
     @ManyToOne
     @JoinColumn(name = "user_id")
