@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Setter
 @Getter
@@ -32,6 +33,13 @@ public class CommentEntity {
     private String conteudo;
 
     private boolean valido;
+
+    private Integer profileAnimal;
+
+    @PrePersist
+    private void assignRandomProfileAnimal() {
+        this.profileAnimal = ThreadLocalRandom.current().nextInt(1, 21);
+    }
 
     @OneToMany(mappedBy = "comment")
     @JsonIgnoreProperties("comment")  // Evita loop infinito durante a serialização de ComplaintEntity

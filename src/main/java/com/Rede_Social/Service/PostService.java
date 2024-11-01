@@ -171,6 +171,15 @@ public class PostService {
         }
     }
 
+    public List<PostEntity> Top10PostsComLike() {
+        try {
+            return postRepository.Top10PostsComLike();
+        } catch (Exception e) {
+            System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
+            throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
+        }
+    }
+
     public PostEntity postMaisCurtidoDaSemana(){
         try{
             return postRepository.findByMaisCurtido();

@@ -83,4 +83,13 @@ comment.setPost(post);
             throw new RuntimeException("Erro no service, não deu para listar os comentarios: " + e.getMessage());
         }
     }
+
+    public List<CommentEntity> findAllByPost_Uuid(UUID uuid) {
+        try {
+            return commentRepository.findAllByPost_Uuid(uuid);
+        } catch (Exception e) {
+            System.out.println("Erro no service, não deu para listar os comentarios de um post específico" + e.getMessage());
+            throw new RuntimeException("Erro no service, não deu para listar os comentarios de um post específico" + e.getMessage());
+        }
+    }
 }

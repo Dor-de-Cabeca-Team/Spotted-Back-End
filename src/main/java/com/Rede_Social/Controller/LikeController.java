@@ -11,6 +11,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/like")
+@CrossOrigin(origins = "http://localhost:4200")
 public class LikeController {
 
     @Autowired

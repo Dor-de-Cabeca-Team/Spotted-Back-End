@@ -28,9 +28,8 @@ public class LikeEntity {
     @JsonIgnoreProperties({"idade", "email", "senha", "ativo", "complaints", "posts", "comments", "likes"})
     private UserEntity user;
 
-    @NotNull
     @ManyToOne
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", nullable = true)
     @JsonIgnoreProperties("likes")  // Evita loop infinito durante a serialização de PostEntity
     private PostEntity post;
 

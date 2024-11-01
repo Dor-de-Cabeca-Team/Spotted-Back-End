@@ -11,6 +11,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/comment")//request
+@CrossOrigin(origins = "http://localhost:4200")
 public class CommentController {
 
     @Autowired
@@ -58,6 +59,15 @@ public class CommentController {
         try {
             return ResponseEntity.ok(commentService.findAll());
         } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/findAllByPost_Uuid")
+    public ResponseEntity<List<CommentEntity>> findAllByPostId(@RequestParam UUID uuid){
+        try {
+            return ResponseEntity.ok(commentService.findAllByPost_Uuid(uuid));
+        } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
     }

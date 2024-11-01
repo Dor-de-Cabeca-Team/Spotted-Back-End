@@ -12,6 +12,9 @@ import java.util.UUID;
 public interface PostRepository extends JpaRepository<PostEntity, UUID> {
     List<PostEntity> findByTagsNome(String nome);
 
+    @Query(value = "SELECT p.* FROM post p " + "LEFT JOIN likee l ON p.uuid = l.post_id " + "GROUP BY p.uuid " + "ORDER BY COUNT(l.uuid) DESC " + "LIMIT 10", nativeQuery = true)
+    List<PostEntity> Top10PostsComLike();
+
     @Query(value = "SELECT p.* " +
             "FROM post p " +
             "JOIN like l ON p.id = l.post_id " +
