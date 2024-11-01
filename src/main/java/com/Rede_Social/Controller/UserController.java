@@ -71,4 +71,13 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Falha na validação da conta.");
         }
     }
+
+    @PostMapping("/login-provisorio")
+    public ResponseEntity<UserEntity> loginProvisorio(@RequestParam String email, @RequestParam String senha) {
+        try {
+            return ResponseEntity.ok(userService.loginProvisorio(email,senha));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+    }
 }
