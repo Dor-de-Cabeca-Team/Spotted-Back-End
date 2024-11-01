@@ -19,7 +19,7 @@ public class GeminiService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public boolean validadeAI(String userInput) {
-        String prompt = "Analise a seguinte mensagem e determine se é ofensiva. Se for ofensiva, retorne o número '0'. Se não for ofensiva, retorne o número '1'. Apenas um número deve ser retornado sem qualquer explicação adicional. Mensagem: " + userInput;
+        String prompt = "Analise a seguinte mensagem e determine se é extremamente ofensiva, se há menção direta de discurso de ódio, nazismo, racismo, homofobia, misoginia, transfobia. Se a mensagem conter qualquer uma das ofensas anteriores, em grau elevado, retorne o número '0'. Caso constŕario, se não for ofensiva, retorne o número '1'. Apenas um número deve ser retornado sem qualquer explicação adicional. Mensagem: " + userInput;
         System.out.println("Prompt enviado: " + prompt);
         String jsonPayload = String.format("{\"contents\":[{\"role\": \"user\",\"parts\":[{\"text\": \"%s\"}]}]}", prompt);
 
@@ -67,24 +67,12 @@ public class GeminiService {
             JsonNode textNode = contentNode.path("parts").get(0).path("text");
 
             String result = textNode.asText();
+            System.out.println("Resultado da API é" + result);
 
-            JsonNode safetyRatingsNode = candidatesNode.path("safetyRatings");
-
-            // Verifica se há discurso de ódio ou assédio com probabilidade "MEDIUM" ou superior
-            for (JsonNode rating : safetyRatingsNode) {
-                String category = rating.path("category").asText();
-                String probability = rating.path("probability").asText();
-
-                if ((category.equals("HARM_CATEGORY_HATE_SPEECH") || category.equals("HARM_CATEGORY_HARASSMENT"))
-                        && (probability.equals("MEDIUM") || probability.equals("HIGH"))) {
-                    // Mensagem é ofensiva
-                    return "0";
-                }
-            }
-            // Retorna o resultado do modelo, a menos que tenha sido considerado ofensivo
+            // Retorna o resultado da API
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse API response", e);
+            return "0";
         }
     }
 
