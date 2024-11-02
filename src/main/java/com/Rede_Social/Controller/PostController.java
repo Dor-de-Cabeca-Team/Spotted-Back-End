@@ -129,7 +129,7 @@ public class PostController {
         }
     }
 
-    @GetMapping("/PostsValidos")
+    @GetMapping("/postsValidos")
     public ResponseEntity<List<PostEntity>> PostsValidos() {
         try {
             return ResponseEntity.ok(postService.PostsValidos());
