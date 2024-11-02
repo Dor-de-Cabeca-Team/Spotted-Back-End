@@ -128,4 +128,13 @@ public class PostController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/PostsValidos")
+    public ResponseEntity<List<PostEntity>> PostsValidos() {
+        try {
+            return ResponseEntity.ok(postService.PostsValidos());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
