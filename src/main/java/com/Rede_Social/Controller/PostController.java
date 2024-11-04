@@ -120,4 +120,21 @@ public class PostController {
         }
     }
 
+    @GetMapping("/maisCurtidoDaSemana")
+    public ResponseEntity<PostEntity> postMaisCurtidoDaSemana(){
+        try{
+            return ResponseEntity.ok(postService.postMaisCurtidoDaSemana());
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/postsValidos")
+    public ResponseEntity<List<PostEntity>> PostsValidos() {
+        try {
+            return ResponseEntity.ok(postService.PostsValidos());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

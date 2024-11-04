@@ -82,4 +82,16 @@ public class UserService {
         }
         return false;
     }
+
+    public UserEntity loginProvisorio(String email, String senha) {
+        try {
+            return userRepository.findByEmailAndSenha(email, senha)
+                    .orElseThrow(UserNotFoundException::new);
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Erro no service, não foi possível realizar o login: " + e.getMessage());
+        }
+
+    }
 }

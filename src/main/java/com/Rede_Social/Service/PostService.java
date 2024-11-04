@@ -179,4 +179,21 @@ public class PostService {
             throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
         }
     }
+
+    public PostEntity postMaisCurtidoDaSemana(){
+        try{
+            return postRepository.findByMaisCurtido();
+        }catch (Exception e){
+            throw new RuntimeException("Erro ao buscar o post mais curtido da semana: " + e.getMessage());
+        }
+    }
+
+    public List<PostEntity> PostsValidos() {
+        try {
+            return postRepository.PostsValidos();
+        } catch (Exception e) {
+            System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
+            throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
+        }
+    }
 }
