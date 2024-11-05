@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -100,11 +101,15 @@ public class PostService {
             PostEntity post = postRepository.findById(idPost).orElseThrow(PostNotFoundException::new);
             UserEntity user = userRepository.findById(idUser).orElseThrow(UserNotFoundException::new);
 
-            LikeEntity like = new LikeEntity(UUID.randomUUID(), user, post, null);
+            boolean likado = likeRepository.findByPostAndUser(idPost, idUser).isPresent();
 
-            likeRepository.save(like);
-
-            return "Like no Post dado";
+            if(!likado) {
+                LikeEntity like = new LikeEntity(UUID.randomUUID(), user, post, null);
+                likeRepository.save(like);
+                return "Like no Post dado";
+            } else{
+                throw new RuntimeException("Usuário já deu like nesse Post");
+            }
         } catch (PostNotFoundException | UserNotFoundException e) {
            throw e;
         } catch (Exception e) {
@@ -117,11 +122,15 @@ public class PostService {
             CommentEntity comentario = commentRepository.findById(idComentario).orElseThrow(() -> new RuntimeException("Comentario não encontrado"));
             UserEntity user = userRepository.findById(idUser).orElseThrow(UserNotFoundException::new);
 
-            LikeEntity like = new LikeEntity(UUID.randomUUID(), user, null, comentario);
+            boolean likado = likeRepository.findByCommentAndUser(idComentario, idUser).isPresent();
 
-            likeRepository.save(like);
-
-            return "Like no comentario dado";
+            if(!likado) {
+                LikeEntity like = new LikeEntity(UUID.randomUUID(), user, null, comentario);
+                likeRepository.save(like);
+                return "Like no comentario dado";
+            }else{
+                throw new RuntimeException("Usuário já deu like nesse Comentário");
+            }
         } catch (UserNotFoundException e){
             throw e;
         } catch (Exception e){
