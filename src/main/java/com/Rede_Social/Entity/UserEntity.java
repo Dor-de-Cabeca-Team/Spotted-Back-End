@@ -91,4 +91,13 @@ public class UserEntity implements UserDetails {
     public String getUsername() {
         return email;
     }
+
+    public UserEntity(Role role, String nome, int idade, String email, String senha, Boolean ativo) {
+        this.role = role;
+        this.nome = nome;
+        this.idade = idade;
+        this.email = email;
+        this.senha = senha;
+        this.ativo = ativo;
+    }
 }

@@ -7,7 +7,7 @@ import com.Rede_Social.Entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
-public interface LoginRepository extends JpaRepository<UserEntity, UUID>{
+public interface AuthRepository extends JpaRepository<UserEntity, UUID>{
 
 	public Optional<UserEntity> findByEmail(String login);
 	

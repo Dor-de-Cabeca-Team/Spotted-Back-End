@@ -1,6 +1,6 @@
 package com.Rede_Social.Config;
 
-import com.Rede_Social.Auth.LoginRepository;
+import com.Rede_Social.Auth.AuthRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityManager {
 	
 	@Autowired
-	private LoginRepository loginRepository;
+	private AuthRepository authRepository;
 	
 	
 	@Bean
@@ -43,7 +43,7 @@ public class SecurityManager {
 
 	@Bean
 	public UserDetailsService userDetailsService() {
-		return username -> loginRepository.findByEmail(username)
+		return username -> authRepository.findByEmail(username)
 				.orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado") );
 	}
 
