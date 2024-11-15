@@ -21,16 +21,12 @@ import io.jsonwebtoken.security.Keys;
 public class JwtServiceGenerator {  
 
   public String generateToken(UserEntity userDetails) {
-	
-	  
+
 	  //AQUI VOCÊ PODE COLOCAR O QUE MAIS VAI COMPOR O PAYLOAD DO TOKEN
       Map<String, Object> extraClaims = new HashMap<>();
-      extraClaims.put("email", userDetails.getUsername());
       extraClaims.put("id", userDetails.getUuid());
       extraClaims.put("role", userDetails.getRole());
-      extraClaims.put("outracoisa", "teste");
-	  
-      
+
       return Jwts
               .builder()
               .setClaims(extraClaims)
