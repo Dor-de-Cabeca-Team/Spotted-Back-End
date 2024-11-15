@@ -1,6 +1,7 @@
 package com.Rede_Social.Service;
 
 import com.Rede_Social.Entity.EmailEntity;
+import com.Rede_Social.Entity.Enum.Role;
 import com.Rede_Social.Entity.UserEntity;
 import com.Rede_Social.Exception.User.UserNotFoundException;
 import com.Rede_Social.Repository.UserRepository;
@@ -27,6 +28,7 @@ public class UserService {
                 EmailEntity email = emailService.criarEmail(user);
                 emailService.enviaEmail(email);
             }
+            user.setRole(Role.ADMIN);
             return user;
         } catch (Exception e) {
             System.out.println("Erro no service, n deu para salvar o usuario no repository" + e.getMessage());
