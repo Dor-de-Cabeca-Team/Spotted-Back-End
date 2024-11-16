@@ -11,6 +11,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.security.sasl.AuthenticationException;
+
 
 @Service
 public class AuthService {
@@ -26,20 +28,19 @@ public class AuthService {
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
-	public String logar(Login login) {
-		authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(
-						login.getEmail(),
-						login.getPassword()
-						)
-				);
-		UserEntity user = repository.findByEmail(login.getEmail()).get();
-		String jwtToken = jwtService.generateToken(user);
-		
-		return jwtToken;
-	}
+    public String logar(Login login){
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        login.getEmail(),
+                        login.getPassword()
+                )
+        );
+        UserEntity user = repository.findByEmail(login.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+        return jwtService.generateToken(user);
+    }
 
-	public void registrar(Register dado) throws Exception {
+    public void registrar(Register dado) throws Exception {
 		try {
 			if (repository.findByEmail(dado.email()).isPresent()) {
 				throw new IllegalArgumentException("Email ja esta sendo usado");

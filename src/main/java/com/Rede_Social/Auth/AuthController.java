@@ -18,20 +18,19 @@ public class AuthController {
 	@Autowired
 	private AuthService authService;
 
-	@PostMapping("/login")
-	public ResponseEntity<String> logar(@RequestBody Login login) {
-		try {
-			return ResponseEntity.ok(authService.logar(login));
-		}catch(AuthenticationException ex) {
-			System.out.println(ex.getMessage());
-			return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-		}catch (Exception e) {
-			System.out.println(e.getMessage());
-			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-		}
-	}
+    @PostMapping("/login")
+    public ResponseEntity<String> logar(@RequestBody Login login) {
+        try {
+            String token = authService.logar(login);
+            return ResponseEntity.ok(token);
+        } catch (AuthenticationException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha incorretos.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao processar a solicitação.");
+        }
+    }
 
-	@PostMapping("/register")
+    @PostMapping("/register")
 	public ResponseEntity registrar(@RequestBody Register dado) {
 		try {
 			authService.registrar(dado);
