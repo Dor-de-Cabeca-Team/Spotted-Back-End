@@ -19,7 +19,7 @@ public class LikeController {
     private LikeService likeService;
 
     @PostMapping("/save")
-    public ResponseEntity<LikeDTO> save(@RequestBody LikeEntity like) {
+    public ResponseEntity<String> save(@RequestBody LikeDTO like) {
         try {
             return ResponseEntity.ok(likeService.save(like));
         } catch (Exception e) {
@@ -28,7 +28,7 @@ public class LikeController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<LikeDTO> update(@RequestBody LikeEntity like, @RequestParam UUID uuid) {
+    public ResponseEntity<String> update(@RequestBody LikeDTO like, @RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(likeService.update(like, uuid));
         } catch (Exception e) {

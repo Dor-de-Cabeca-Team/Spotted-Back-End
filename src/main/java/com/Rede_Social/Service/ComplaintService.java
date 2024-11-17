@@ -34,34 +34,49 @@ public class ComplaintService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public ComplaintDTO save(ComplaintEntity complaint) {
+    public String save(ComplaintDTO complaint) {
         try {
-            UserEntity user = userRepository.findById(complaint.getUser().getUuid()).orElseThrow(UserNotFoundException::new);
-            PostEntity post = postRepository.findById(complaint.getPost().getUuid()).orElseThrow(PostNotFoundException::new);
+            UserEntity user = userRepository.findById(complaint.idUser()).orElseThrow(UserNotFoundException::new);
+            PostEntity post = postRepository.findById(complaint.idPost()).orElseThrow(PostNotFoundException::new);
 
-            if (complaint.getComment() != null){
-                CommentEntity comentario = commentRepository.findById(complaint.getComment().getUuid()).orElseThrow(RuntimeException::new);
-                complaint.setComment(comentario);
+            CommentEntity comment = null;
+            if (complaint.idComment() != null) {
+                comment = commentRepository.findById(complaint.idComment()).orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
             }
 
-            complaint.setUser(user);
-            complaint.setPost(post);
+            ComplaintEntity complaintEntity = new ComplaintEntity();
+            complaintEntity.setUser(user);
+            complaintEntity.setPost(post);
+            complaintEntity.setComment(comment);
 
-            complaintRepository.save(complaint);
+            complaintRepository.save(complaintEntity);
 
-            return ComplaintDTOMapper.toComplaintDto(complaint);
+            return "Denuncia criada";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar a reclamação no repository: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para salvar a reclamação no repository: " + e.getMessage());
         }
     }
 
-    public ComplaintDTO update(ComplaintEntity complaint, UUID uuid) {
+    public String update(ComplaintDTO complaint, UUID uuid) {
         try {
-            complaintRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Reclamação não existe no banco"));
-            complaint.setUuid(uuid);
-            complaintRepository.save(complaint);
-            return ComplaintDTOMapper.toComplaintDto(complaint);
+            ComplaintEntity existingComplaint = complaintRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Reclamação não existe no banco"));
+
+            UserEntity user = userRepository.findById(complaint.idUser()).orElseThrow(UserNotFoundException::new);
+            PostEntity post = postRepository.findById(complaint.idPost()).orElseThrow(PostNotFoundException::new);
+
+            CommentEntity comment = null;
+            if (complaint.idComment() != null) {
+                comment = commentRepository.findById(complaint.idComment()).orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
+            }
+
+            existingComplaint.setUser(user);
+            existingComplaint.setPost(post);
+            existingComplaint.setComment(comment);
+
+            complaintRepository.save(existingComplaint);
+
+            return "Denuncia atualizada";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para atualizar a reclamação no repository: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para atualizar a reclamação no repository: " + e.getMessage());

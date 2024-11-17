@@ -40,25 +40,26 @@ public class PostService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public PostDTO save(PostEntity post) {
+    public String save(PostDTO post) {
         try {
-            UserEntity user = userRepository.findById(post.getUser().getUuid()).orElseThrow(UserNotFoundException::new);
+            UserEntity user = userRepository.findById(post.getUserId()).orElseThrow(UserNotFoundException::new);
 
-            List<UUID> tagsId = post.getTags().stream().map(TagEntity::getUuid).toList();
+            List<UUID> tagsId = post.getTagsId();
 
-            List<TagEntity> tags = tagRepository.findAllById(tagsId);
+            PostEntity postEntity = new PostEntity();
+            postEntity.setConteudo(post.getConteudo());
+            postEntity.setData(Instant.now());
+            postEntity.setValido(geminiService.validadeAI(post.getConteudo()));
+            postEntity.setUser(user);
 
-            post.setUser(user);
+            if(tagsId != null && !tagsId.isEmpty()) {
+                List<TagEntity> tags = tagRepository.findAllById(tagsId);
+                postEntity.setTags(tags);
+            }
 
-            post.setTags(tags);
+            postRepository.save(postEntity);
 
-            post.setData(Instant.now());
-
-            post.setValido(geminiService.validadeAI(post.getConteudo()));
-
-            postRepository.save(post);
-
-            return PostDTOMapper.toPostDto(post, null, likeRepository, complaintRepository);
+            return "Post Criado";
         } catch (UserNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -67,13 +68,21 @@ public class PostService {
         }
     }
 
-    public PostDTO update(PostEntity post, UUID uuid) {
+    public String update(PostDTO post, UUID uuid) {
         try {
-            postRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Post não existe no banco"));
-            post.setUuid(uuid);
-            postRepository.save(post);
+            PostEntity existingPost = postRepository.findById(uuid)
+                    .orElseThrow(() -> new RuntimeException("Post não existe no banco"));
+            existingPost.setConteudo(post.getConteudo());
+            existingPost.setValido(geminiService.validadeAI(post.getConteudo()));
 
-            return PostDTOMapper.toPostDto(post, null, likeRepository, complaintRepository);
+            if (post.getTagsId() != null && !post.getTagsId().isEmpty()) {
+                List<TagEntity> updatedTags = tagRepository.findAllById(post.getTagsId());
+                existingPost.setTags(updatedTags);
+            }
+
+            PostEntity updatedPost = postRepository.save(existingPost);
+
+            return "Post atualizado";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());

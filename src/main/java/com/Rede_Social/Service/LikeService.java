@@ -2,8 +2,15 @@ package com.Rede_Social.Service;
 
 import com.Rede_Social.DTO.Consulta.LikeDTO;
 import com.Rede_Social.DTO.Mapper.LikeDTOMapper;
+import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Entity.LikeEntity;
+import com.Rede_Social.Entity.PostEntity;
+import com.Rede_Social.Entity.UserEntity;
+import com.Rede_Social.Repository.CommentRepository;
 import com.Rede_Social.Repository.LikeRepository;
+import com.Rede_Social.Repository.PostRepository;
+import com.Rede_Social.Repository.UserRepository;
+import org.hibernate.annotations.Array;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,22 +24,54 @@ public class LikeService {
     @Autowired
     private LikeRepository likeRepository;
 
-    public LikeDTO save(LikeEntity like) {
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+    public String save(LikeDTO like) {
         try {
-            LikeEntity likeEntity = likeRepository.save(like);
-            return LikeDTOMapper.toLikeDto(likeEntity);
+            LikeEntity likeEntity = new LikeEntity();
+
+            UserEntity user = userRepository.findById(like.idUser()).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+            PostEntity post = postRepository.findById(like.idPost()).orElseThrow(() -> new RuntimeException("Post não encontrado"));
+            CommentEntity comment = commentRepository.findById(like.idComment()).orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
+
+            likeEntity.setUser(user);
+            likeEntity.setPost(post);
+            likeEntity.setComment(comment);
+            likeRepository.save(likeEntity);
+
+            return "Like criado";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar o like no repository: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para salvar o like no repository: " + e.getMessage());
         }
     }
 
-    public LikeDTO update(LikeEntity like, UUID uuid) {
+    public String update(LikeDTO like, UUID uuid) {
         try {
-            likeRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Like não existe no banco"));
-            like.setUuid(uuid);
-            LikeEntity likeEntity = likeRepository.save(like);
-            return LikeDTOMapper.toLikeDto(likeEntity);
+            LikeEntity existingLike = likeRepository.findById(uuid)
+                    .orElseThrow(() -> new RuntimeException("Like não existe no banco"));
+
+            UserEntity user = userRepository.findById(like.idUser())
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+            PostEntity post = postRepository.findById(like.idPost())
+                    .orElseThrow(() -> new RuntimeException("Post não encontrado"));
+            CommentEntity comment = commentRepository.findById(like.idComment())
+                    .orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
+
+            existingLike.setUser(user);
+            existingLike.setPost(post);
+            existingLike.setComment(comment);
+
+            likeRepository.save(existingLike);
+
+            return "Like atualizado";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para atualizar o like no repository: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para atualizar o like no repository: " + e.getMessage());

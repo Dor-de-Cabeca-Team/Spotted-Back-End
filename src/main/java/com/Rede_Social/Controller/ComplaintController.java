@@ -19,7 +19,7 @@ public class ComplaintController {
     private ComplaintService complaintService;
 
     @PostMapping("/save")
-    public ResponseEntity<ComplaintDTO> save(@RequestBody ComplaintEntity complaint) {
+    public ResponseEntity<String> save(@RequestBody ComplaintDTO complaint) {
         try {
             return ResponseEntity.ok(complaintService.save(complaint));
         } catch (Exception e) {
@@ -28,7 +28,7 @@ public class ComplaintController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ComplaintDTO> update(@RequestBody ComplaintEntity complaint, @RequestParam UUID uuid) {
+    public ResponseEntity<String> update(@RequestBody ComplaintDTO complaint, @RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(complaintService.update(complaint, uuid));
         } catch (Exception e) {

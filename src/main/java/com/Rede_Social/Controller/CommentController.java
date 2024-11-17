@@ -19,7 +19,7 @@ public class CommentController {
     private CommentService commentService;
 
     @PostMapping("/save")
-    public ResponseEntity<CommentDTO> save(@RequestBody CommentEntity comment) {
+    public ResponseEntity<String> save(@RequestBody CommentDTO comment) {
         try {
             return ResponseEntity.ok(commentService.save(comment));
         } catch (Exception e) {
@@ -29,7 +29,7 @@ public class CommentController {
 
 
     @PutMapping("/update")
-    public ResponseEntity<CommentDTO> update(@RequestBody CommentEntity comment, @RequestParam UUID uuid) {
+    public ResponseEntity<String> update(@RequestBody CommentDTO comment, @RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(commentService.update(comment, uuid));
         } catch (Exception e) {

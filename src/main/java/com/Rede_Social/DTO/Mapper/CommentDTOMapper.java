@@ -23,7 +23,8 @@ public class CommentDTOMapper {
                 commentEntity.getConteudo(),
                 commentEntity.getLikes() != null ? commentEntity.getLikes().size() : 0,
                 commentEntity.getProfileAnimal(),
-                commentEntity.getPost().getUuid()
+                commentEntity.getPost().getUuid(),
+                commentEntity.getUser().getUuid()
         );
     }
 }

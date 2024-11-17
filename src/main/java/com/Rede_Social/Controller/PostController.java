@@ -25,7 +25,7 @@ public class PostController {
     private CommentService commentService;
 
     @PostMapping("/save")
-    public ResponseEntity<PostDTO> save(@RequestBody PostEntity post) {
+    public ResponseEntity<String> save(@RequestBody PostDTO post) {
         try {
             return ResponseEntity.ok(postService.save(post));
         } catch (Exception e) {
@@ -34,7 +34,7 @@ public class PostController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<PostDTO> update(@RequestBody PostEntity post, @RequestParam UUID uuid) {
+    public ResponseEntity<String> update(@RequestBody PostDTO post, @RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(postService.update(post, uuid));
         } catch (Exception e) {

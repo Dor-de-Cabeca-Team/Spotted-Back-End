@@ -20,7 +20,7 @@ public class TagController {
     private TagService tagService;
 
     @PostMapping("/save")
-    public ResponseEntity<TagDTO> save(@RequestBody TagEntity tag) {
+    public ResponseEntity<String> save(@RequestBody TagDTO tag) {
         try {
             return ResponseEntity.ok(tagService.save(tag));
         } catch (Exception e) {
@@ -29,7 +29,7 @@ public class TagController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<TagDTO> update(@RequestBody TagEntity tag, @RequestParam UUID uuid) {
+    public ResponseEntity<String> update(@RequestBody TagDTO tag, @RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(tagService.update(tag, uuid));
         } catch (Exception e) {

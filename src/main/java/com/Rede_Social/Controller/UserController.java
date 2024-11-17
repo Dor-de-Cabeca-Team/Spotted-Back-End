@@ -19,7 +19,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/save")
-    public ResponseEntity<UserDTO> save(@RequestBody UserEntity user) {
+    public ResponseEntity<String> save(@RequestBody UserDTO user) {
         try {
             return ResponseEntity.ok(userService.save(user));
         } catch (Exception e) {
@@ -28,7 +28,7 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<UserDTO> update(@RequestBody UserEntity user, @RequestParam UUID uuid) {
+    public ResponseEntity<String> update(@RequestBody UserDTO user, @RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(userService.update(user, uuid));
         } catch (Exception e) {

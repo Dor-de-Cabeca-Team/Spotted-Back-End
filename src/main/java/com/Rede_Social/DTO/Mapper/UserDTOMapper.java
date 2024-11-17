@@ -8,6 +8,8 @@ public class UserDTOMapper {
         return new UserDTO(
                 userEntity.getNome(),
                 userEntity.getEmail(),
+                userEntity.getSenha(),
+                userEntity.getIdade(),
                 userEntity.getAtivo(),
                 userEntity.getRole()
         );

@@ -2,9 +2,12 @@ package com.Rede_Social.DTO.Mapper;
 
 import com.Rede_Social.DTO.Consulta.PostDTO;
 import com.Rede_Social.Entity.PostEntity;
+import com.Rede_Social.Entity.TagEntity;
 import com.Rede_Social.Repository.ComplaintRepository;
 import com.Rede_Social.Repository.LikeRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PostDTOMapper {
@@ -13,6 +16,9 @@ public class PostDTOMapper {
         boolean isLiked = likeRepository.findByPostAndUser(postEntity.getUuid(), idUser).isPresent();
         boolean isReported = complaintRepository.findByCommentAndUser(postEntity.getUuid(), idUser).isPresent();
 
+        List<UUID> tagIds = postEntity.getTags() != null ?
+                postEntity.getTags().stream().map(TagEntity::getUuid).toList() : new ArrayList<>();
+
         return new PostDTO(
                 postEntity.getUuid(),
                 postEntity.getConteudo(),
@@ -20,7 +26,10 @@ public class PostDTOMapper {
                 isReported,
                 postEntity.getLikes() != null ? postEntity.getLikes().size() : 0,
                 postEntity.getData(),
-                postEntity.getProfileAnimal()
+                postEntity.getProfileAnimal(),
+                postEntity.getUser() != null ? postEntity.getUser().getUuid() : null,
+                tagIds
         );
     }
 }
+

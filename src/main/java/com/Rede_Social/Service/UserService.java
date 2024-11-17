@@ -24,27 +24,44 @@ public class UserService {
     @Autowired
     private EmailService emailService;
 
-    public UserDTO save(UserEntity user) {
+    public String save(UserDTO user) {
         try {
-            userRepository.save(user);
-            if (!user.getEmail().isEmpty()) {
-                EmailEntity email = emailService.criarEmail(user);
+            UserEntity userEntity = new UserEntity();
+            userEntity.setNome(user.getNome());
+            userEntity.setEmail(user.getEmail());
+            userEntity.setSenha(user.getSenha());
+            userEntity.setIdade(user.getIdade());
+            userEntity.setRole(user.getRole() != null ? user.getRole() : Role.USUARIO);
+            userEntity.setAtivo(user.isActivated());
+
+
+            if (userEntity.getEmail() != null && !userEntity.getEmail().isEmpty()) {
+                EmailEntity email = emailService.criarEmail(userEntity);
                 emailService.enviaEmail(email);
             }
-            user.setRole(Role.ADMIN);
-            return UserDTOMapper.toUserDto(user);
+            //userEntity.setRole(Role.ADMIN); <------------------------ pra que isso aqui?????
+            userRepository.save(userEntity);
+
+            return "Usuário criado";
         } catch (Exception e) {
             System.out.println("Erro no service, n deu para salvar o usuario no repository" + e.getMessage());
             throw new RuntimeException("Erro no service, n deu para salvar o usuario no repository" + e.getMessage());
         }
     }
 
-    public UserDTO update(UserEntity user, UUID uuid) {
+    public String update(UserDTO user, UUID uuid) {
         try {
-            userRepository.findById(uuid).orElseThrow(() -> new UserNotFoundException());
-            user.setUuid(uuid);
-            userRepository.save(user);
-            return UserDTOMapper.toUserDto(user);
+            UserEntity existingUser = userRepository.findById(uuid).orElseThrow(UserNotFoundException::new);
+            existingUser.setNome(user.getNome());
+            existingUser.setIdade(user.getIdade());
+            existingUser.setEmail(user.getEmail());
+            existingUser.setSenha(user.getSenha());
+            existingUser.setRole(user.getRole());
+            existingUser.setAtivo(user.isActivated());
+
+            userRepository.save(existingUser);
+
+            return "Usuário atualizado";
         } catch (UserNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -64,7 +81,7 @@ public class UserService {
     }
 
     public UserDTO findById(UUID uuid) {
-        UserEntity user = userRepository.findById(uuid).orElseThrow(() -> new UserNotFoundException());
+        UserEntity user = userRepository.findById(uuid).orElseThrow(UserNotFoundException::new);
         return UserDTOMapper.toUserDto(user);
     }
 
@@ -84,7 +101,7 @@ public class UserService {
     }
 
     public boolean validarConta(UUID idUser, String hashRecebido) {
-        UserEntity usuario = userRepository.findById(idUser).orElseThrow(() -> new UserNotFoundException());
+        UserEntity usuario = userRepository.findById(idUser).orElseThrow(UserNotFoundException::new);
 
         String hashGerado = EmailService.generateHash(usuario.getNome(), usuario.getEmail());
 
