@@ -23,4 +23,5 @@ public class PostDTO {
     private Integer profileAnimal;
     private UUID userId;
     private List<UUID> tagsId;
+    private List<UUID> commentsId;
 }

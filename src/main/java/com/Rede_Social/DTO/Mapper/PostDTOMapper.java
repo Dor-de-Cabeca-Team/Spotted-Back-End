@@ -1,6 +1,7 @@
 package com.Rede_Social.DTO.Mapper;
 
 import com.Rede_Social.DTO.Consulta.PostDTO;
+import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Entity.PostEntity;
 import com.Rede_Social.Entity.TagEntity;
 import com.Rede_Social.Repository.ComplaintRepository;
@@ -19,6 +20,9 @@ public class PostDTOMapper {
         List<UUID> tagIds = postEntity.getTags() != null ?
                 postEntity.getTags().stream().map(TagEntity::getUuid).toList() : new ArrayList<>();
 
+        List<UUID> commentIds = postEntity.getComments() != null ?
+                postEntity.getComments().stream().map(CommentEntity::getUuid).toList() : new ArrayList<>();
+
         return new PostDTO(
                 postEntity.getUuid(),
                 postEntity.getConteudo(),
@@ -28,7 +32,8 @@ public class PostDTOMapper {
                 postEntity.getData(),
                 postEntity.getProfileAnimal(),
                 postEntity.getUser() != null ? postEntity.getUser().getUuid() : null,
-                tagIds
+                tagIds,
+                commentIds
         );
     }
 }
