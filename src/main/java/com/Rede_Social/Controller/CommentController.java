@@ -19,7 +19,7 @@ public class CommentController {
     private CommentService commentService;
 
     @PostMapping("/save")
-    public ResponseEntity<CommentEntity> save(@RequestBody CommentEntity comment) {
+    public ResponseEntity<CommentDTO> save(@RequestBody CommentEntity comment) {
         try {
             return ResponseEntity.ok(commentService.save(comment));
         } catch (Exception e) {
@@ -29,7 +29,7 @@ public class CommentController {
 
 
     @PutMapping("/update")
-    public ResponseEntity<CommentEntity> update(@RequestBody CommentEntity comment, @RequestParam UUID uuid) {
+    public ResponseEntity<CommentDTO> update(@RequestBody CommentEntity comment, @RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(commentService.update(comment, uuid));
         } catch (Exception e) {
@@ -47,7 +47,7 @@ public class CommentController {
     }
 
     @GetMapping("/findById")
-    public ResponseEntity<CommentEntity> findById(@RequestParam UUID uuid) {
+    public ResponseEntity<CommentDTO> findById(@RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(commentService.findById(uuid));
         } catch (Exception e) {
@@ -56,7 +56,7 @@ public class CommentController {
     }
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<CommentEntity>> findAll() {
+    public ResponseEntity<List<CommentDTO>> findAll() {
         try {
             return ResponseEntity.ok(commentService.findAll());
         } catch (Exception e) {

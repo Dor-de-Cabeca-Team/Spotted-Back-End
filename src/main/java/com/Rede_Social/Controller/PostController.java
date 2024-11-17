@@ -25,7 +25,7 @@ public class PostController {
     private CommentService commentService;
 
     @PostMapping("/save")
-    public ResponseEntity<PostEntity> save(@RequestBody PostEntity post) {
+    public ResponseEntity<PostDTO> save(@RequestBody PostEntity post) {
         try {
             return ResponseEntity.ok(postService.save(post));
         } catch (Exception e) {
@@ -34,7 +34,7 @@ public class PostController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<PostEntity> update(@RequestBody PostEntity post, @RequestParam UUID uuid) {
+    public ResponseEntity<PostDTO> update(@RequestBody PostEntity post, @RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(postService.update(post, uuid));
         } catch (Exception e) {
@@ -53,7 +53,7 @@ public class PostController {
     }
 
     @GetMapping("/findById")
-    public ResponseEntity<PostEntity> findById(@RequestParam UUID uuid) {
+    public ResponseEntity<PostDTO> findById(@RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(postService.findById(uuid));
         } catch (Exception e) {
@@ -63,7 +63,7 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findAll")
-    public ResponseEntity<List<PostEntity>> findAll() {
+    public ResponseEntity<List<PostDTO>> findAll() {
         try {
             return ResponseEntity.ok(postService.findAll());
         } catch (Exception e) {
@@ -83,9 +83,9 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @PostMapping("/like-comentario")
-    public ResponseEntity<String> darLikeComentario(@RequestParam UUID idComentario, @RequestParam UUID idUser){
+    public ResponseEntity<String> darLikeComentario(@RequestParam UUID idComment, @RequestParam UUID idUser){
         try {
-            return ResponseEntity.ok(postService.darLikeComentario(idComentario, idUser));
+            return ResponseEntity.ok(postService.darLikeComentario(idComment, idUser));
         } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
@@ -103,16 +103,16 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @PostMapping("/denunciar-comentario")
-    public ResponseEntity<String> denunciarComentario(@RequestParam UUID idComentario, @RequestParam UUID idUser){
+    public ResponseEntity<String> denunciarComentario(@RequestParam UUID idComment, @RequestParam UUID idUser){
         try {
-            return ResponseEntity.ok(postService.denunciarComentario(idComentario, idUser));
+            return ResponseEntity.ok(postService.denunciarComentario(idComment, idUser));
         } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
     }
 
     @GetMapping("/findTags")
-    public ResponseEntity<List<PostEntity>> findPostByTag(@RequestParam String tag){
+    public ResponseEntity<List<PostDTO>> findPostByTag(@RequestParam String tag){
         try {
             return ResponseEntity.ok(postService.findByTagsNome(tag));
         } catch (Exception e){
@@ -122,7 +122,7 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/top10PostsComLike")
-    public ResponseEntity<List<PostEntity>> Top10PostsComLike() {
+    public ResponseEntity<List<PostDTO>> Top10PostsComLike() {
         try {
             return ResponseEntity.ok(postService.Top10PostsComLike());
         } catch (Exception e) {
@@ -131,7 +131,7 @@ public class PostController {
     }
 
     @GetMapping("/maisCurtidoDaSemana")
-    public ResponseEntity<PostEntity> postMaisCurtidoDaSemana(){
+    public ResponseEntity<PostDTO> postMaisCurtidoDaSemana(){
         try{
             return ResponseEntity.ok(postService.postMaisCurtidoDaSemana());
         } catch (Exception e){

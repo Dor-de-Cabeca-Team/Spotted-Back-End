@@ -1,5 +1,6 @@
 package com.Rede_Social.Controller;
 
+import com.Rede_Social.DTO.Consulta.ComplaintDTO;
 import com.Rede_Social.Entity.ComplaintEntity;
 import com.Rede_Social.Service.ComplaintService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class ComplaintController {
     private ComplaintService complaintService;
 
     @PostMapping("/save")
-    public ResponseEntity<ComplaintEntity> save(@RequestBody ComplaintEntity complaint) {
+    public ResponseEntity<ComplaintDTO> save(@RequestBody ComplaintEntity complaint) {
         try {
             return ResponseEntity.ok(complaintService.save(complaint));
         } catch (Exception e) {
@@ -27,7 +28,7 @@ public class ComplaintController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ComplaintEntity> update(@RequestBody ComplaintEntity complaint, @RequestParam UUID uuid) {
+    public ResponseEntity<ComplaintDTO> update(@RequestBody ComplaintEntity complaint, @RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(complaintService.update(complaint, uuid));
         } catch (Exception e) {
@@ -45,7 +46,7 @@ public class ComplaintController {
     }
 
     @GetMapping("/findById")
-    public ResponseEntity<ComplaintEntity> findById(@RequestParam UUID uuid) {
+    public ResponseEntity<ComplaintDTO> findById(@RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(complaintService.findById(uuid));
         } catch (Exception e) {
@@ -54,7 +55,7 @@ public class ComplaintController {
     }
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<ComplaintEntity>> findAll() {
+    public ResponseEntity<List<ComplaintDTO>> findAll() {
         try {
             return ResponseEntity.ok(complaintService.findAll());
         } catch (Exception e) {

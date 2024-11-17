@@ -1,5 +1,6 @@
 package com.Rede_Social.Controller;
 
+import com.Rede_Social.DTO.Consulta.UserDTO;
 import com.Rede_Social.Entity.UserEntity;
 import com.Rede_Social.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/save")
-    public ResponseEntity<UserEntity> save(@RequestBody UserEntity user) {
+    public ResponseEntity<UserDTO> save(@RequestBody UserEntity user) {
         try {
             return ResponseEntity.ok(userService.save(user));
         } catch (Exception e) {
@@ -27,7 +28,7 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<UserEntity> update(@RequestBody UserEntity user, @RequestParam UUID uuid) {
+    public ResponseEntity<UserDTO> update(@RequestBody UserEntity user, @RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(userService.update(user, uuid));
         } catch (Exception e) {
@@ -45,7 +46,7 @@ public class UserController {
     }
 
     @GetMapping("/findById")
-    public ResponseEntity<UserEntity> findById(@RequestParam UUID uuid) {
+    public ResponseEntity<UserDTO> findById(@RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(userService.findById(uuid));
         } catch (Exception e) {
@@ -54,7 +55,7 @@ public class UserController {
     }
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<UserEntity>> findAll() {
+    public ResponseEntity<List<UserDTO>> findAll() {
         try {
             return ResponseEntity.ok(userService.findAll());
         } catch (Exception e) {
@@ -73,7 +74,7 @@ public class UserController {
     }
 
     @PostMapping("/login-provisorio")
-    public ResponseEntity<UserEntity> loginProvisorio(@RequestParam String email, @RequestParam String senha) {
+    public ResponseEntity<UserDTO> loginProvisorio(@RequestParam String email, @RequestParam String senha) {
         try {
             return ResponseEntity.ok(userService.loginProvisorio(email,senha));
         } catch (Exception e) {

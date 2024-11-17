@@ -1,5 +1,7 @@
 package com.Rede_Social.Service;
 
+import com.Rede_Social.DTO.Consulta.UserDTO;
+import com.Rede_Social.DTO.Mapper.UserDTOMapper;
 import com.Rede_Social.Entity.EmailEntity;
 import com.Rede_Social.Entity.Enum.Role;
 import com.Rede_Social.Entity.UserEntity;
@@ -9,6 +11,7 @@ import com.Rede_Social.Service.Email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +24,7 @@ public class UserService {
     @Autowired
     private EmailService emailService;
 
-    public UserEntity save(UserEntity user) {
+    public UserDTO save(UserEntity user) {
         try {
             userRepository.save(user);
             if (!user.getEmail().isEmpty()) {
@@ -29,18 +32,19 @@ public class UserService {
                 emailService.enviaEmail(email);
             }
             user.setRole(Role.ADMIN);
-            return user;
+            return UserDTOMapper.toUserDto(user);
         } catch (Exception e) {
             System.out.println("Erro no service, n deu para salvar o usuario no repository" + e.getMessage());
             throw new RuntimeException("Erro no service, n deu para salvar o usuario no repository" + e.getMessage());
         }
     }
 
-    public UserEntity update(UserEntity user, UUID uuid) {
+    public UserDTO update(UserEntity user, UUID uuid) {
         try {
             userRepository.findById(uuid).orElseThrow(() -> new UserNotFoundException());
             user.setUuid(uuid);
-            return userRepository.save(user);
+            userRepository.save(user);
+            return UserDTOMapper.toUserDto(user);
         } catch (UserNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -59,13 +63,20 @@ public class UserService {
         }
     }
 
-    public UserEntity findById(UUID uuid) {
-        return userRepository.findById(uuid).orElseThrow(() -> new UserNotFoundException());
+    public UserDTO findById(UUID uuid) {
+        UserEntity user = userRepository.findById(uuid).orElseThrow(() -> new UserNotFoundException());
+        return UserDTOMapper.toUserDto(user);
     }
 
-    public List<UserEntity> findAll() {
+    public List<UserDTO> findAll() {
         try {
-            return userRepository.findAll();
+            List<UserEntity> users = userRepository.findAll();
+            List<UserDTO> userDTOS = new ArrayList<>();
+
+            for(UserEntity user:users) {
+                userDTOS.add(UserDTOMapper.toUserDto(user));
+            }
+            return userDTOS;
         } catch (Exception e) {
             System.out.println("Erro no service, n deu para listar os usuarios do banco" + e.getMessage());
             throw new RuntimeException("Erro no service, n deu para listar todos users " + e.getMessage());
@@ -85,10 +96,11 @@ public class UserService {
         return false;
     }
 
-    public UserEntity loginProvisorio(String email, String senha) {
+    public UserDTO loginProvisorio(String email, String senha) {
         try {
-            return userRepository.findByEmailAndSenha(email, senha)
-                    .orElseThrow(UserNotFoundException::new);
+            UserEntity user = userRepository.findByEmailAndSenha(email, senha).orElseThrow(UserNotFoundException::new);
+
+            return UserDTOMapper.toUserDto(user);
         } catch (UserNotFoundException e) {
             throw e;
         } catch (Exception e) {

@@ -1,5 +1,7 @@
 package com.Rede_Social.Service;
 
+import com.Rede_Social.DTO.Consulta.ComplaintDTO;
+import com.Rede_Social.DTO.Mapper.ComplaintDTOMapper;
 import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Entity.ComplaintEntity;
 import com.Rede_Social.Entity.PostEntity;
@@ -13,6 +15,7 @@ import com.Rede_Social.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +34,7 @@ public class ComplaintService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public ComplaintEntity save(ComplaintEntity complaint) {
+    public ComplaintDTO save(ComplaintEntity complaint) {
         try {
             UserEntity user = userRepository.findById(complaint.getUser().getUuid()).orElseThrow(UserNotFoundException::new);
             PostEntity post = postRepository.findById(complaint.getPost().getUuid()).orElseThrow(PostNotFoundException::new);
@@ -44,18 +47,21 @@ public class ComplaintService {
             complaint.setUser(user);
             complaint.setPost(post);
 
-            return complaintRepository.save(complaint);
+            complaintRepository.save(complaint);
+
+            return ComplaintDTOMapper.toComplaintDto(complaint);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar a reclamação no repository: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para salvar a reclamação no repository: " + e.getMessage());
         }
     }
 
-    public ComplaintEntity update(ComplaintEntity complaint, UUID uuid) {
+    public ComplaintDTO update(ComplaintEntity complaint, UUID uuid) {
         try {
             complaintRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Reclamação não existe no banco"));
             complaint.setUuid(uuid);
-            return complaintRepository.save(complaint);
+            complaintRepository.save(complaint);
+            return ComplaintDTOMapper.toComplaintDto(complaint);
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para atualizar a reclamação no repository: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para atualizar a reclamação no repository: " + e.getMessage());
@@ -72,13 +78,21 @@ public class ComplaintService {
         }
     }
 
-    public ComplaintEntity findById(UUID uuid) {
-        return complaintRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Reclamação não encontrada no banco"));
+    public ComplaintDTO findById(UUID uuid) {
+        ComplaintEntity complaint = complaintRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Reclamação não encontrada no banco"));
+        return ComplaintDTOMapper.toComplaintDto(complaint);
     }
 
-    public List<ComplaintEntity> findAll() {
+    public List<ComplaintDTO> findAll() {
         try {
-            return complaintRepository.findAll();
+            List<ComplaintEntity> complaintEntityList = complaintRepository.findAll();
+            List<ComplaintDTO> complaintDTOList = new ArrayList<>();
+
+            for(ComplaintEntity complaint : complaintEntityList){
+                complaintDTOList.add(ComplaintDTOMapper.toComplaintDto(complaint));
+            }
+
+            return complaintDTOList;
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar as reclamações do banco: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar as reclamacoes: " + e.getMessage());

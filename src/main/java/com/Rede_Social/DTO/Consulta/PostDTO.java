@@ -1,7 +1,23 @@
 package com.Rede_Social.DTO.Consulta;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.Instant;
 import java.util.UUID;
 
-public record PostDTO(UUID idPost, String conteudo, boolean isLiked, Integer likeCount, Instant data, Integer profileAnimal) {
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class PostDTO {
+    private UUID id;
+    private String conteudo;
+    private boolean liked;
+    private boolean reported;
+    private int likeCount;
+    private Instant data;
+    private Integer profileAnimal;
 }
