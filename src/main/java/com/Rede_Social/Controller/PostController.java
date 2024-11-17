@@ -1,5 +1,7 @@
 package com.Rede_Social.Controller;
 
+import com.Rede_Social.DTO.Consulta.PostDTO;
+import com.Rede_Social.DTO.Mapper.PostDTOMapper;
 import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Entity.PostEntity;
 import com.Rede_Social.Service.CommentService;
@@ -139,9 +141,9 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/postsValidos")
-    public ResponseEntity<List<PostEntity>> PostsValidos() {
+    public ResponseEntity<List<PostDTO>> PostsValidos(@RequestParam UUID idUser) {
         try {
-            return ResponseEntity.ok(postService.PostsValidos());
+            return ResponseEntity.ok(postService.PostsValidos(idUser));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

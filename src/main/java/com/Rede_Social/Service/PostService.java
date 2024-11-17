@@ -1,5 +1,7 @@
 package com.Rede_Social.Service;
 
+import com.Rede_Social.DTO.Consulta.PostDTO;
+import com.Rede_Social.DTO.Mapper.PostDTOMapper;
 import com.Rede_Social.Entity.*;
 import com.Rede_Social.Exception.Post.PostNotFoundException;
 import com.Rede_Social.Exception.User.UserNotFoundException;
@@ -197,9 +199,15 @@ public class PostService {
         }
     }
 
-    public List<PostEntity> PostsValidos() {
+    public List<PostDTO> PostsValidos(UUID idUser) {
         try {
-            return postRepository.PostsValidos();
+            List<PostEntity> postsValidos = postRepository.PostsValidos();
+            List<PostDTO> postDTOList = new ArrayList<>();
+            for (PostEntity post : postsValidos) {
+                PostDTO postDto = PostDTOMapper.toPostDto(post, idUser, likeRepository);
+                postDTOList.add(postDto);
+            }
+            return postDTOList;
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());

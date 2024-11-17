@@ -1,13 +1,22 @@
 package com.Rede_Social.Repository;
 
 import com.Rede_Social.Entity.CommentEntity;
+import com.Rede_Social.Entity.LikeEntity;
+import com.Rede_Social.Entity.PostEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface CommentRepository extends JpaRepository<CommentEntity, UUID> {
-    List<CommentEntity> findAllByPost_Uuid(UUID postId);
+    @Query(value = "SELECT c.* FROM comment c " +
+            "WHERE c.valido = true " +
+            "AND c.post_id = ?1" +
+            "ORDER BY c.data DESC " +
+            "LIMIT 10", nativeQuery = true)
+    List<CommentEntity> commentsValidos(UUID post_id);
 }

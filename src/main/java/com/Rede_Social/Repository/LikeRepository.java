@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface LikeRepository extends JpaRepository<LikeEntity, UUID> {
-    @Query(value = "SELECT * FROM likee WHERE likee.post_id = :postId AND likee.user_id = :userId", nativeQuery = true)
+    @Query(value = "SELECT * FROM likee WHERE likee.post_id = :postId AND likee.user_id = :userId AND likee.comment_id IS NULL", nativeQuery = true)
     Optional<LikeEntity> findByPostAndUser(UUID postId, UUID userId);
 
     @Query(value = "SELECT * FROM likee WHERE likee.comment_id = :commentId AND likee.user_id = :userId", nativeQuery = true)

@@ -1,11 +1,16 @@
 package com.Rede_Social.Service;
 
+import com.Rede_Social.DTO.Consulta.CommentDTO;
+import com.Rede_Social.DTO.Consulta.PostDTO;
+import com.Rede_Social.DTO.Mapper.CommentDTOMapper;
+import com.Rede_Social.DTO.Mapper.PostDTOMapper;
 import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Entity.PostEntity;
 import com.Rede_Social.Entity.UserEntity;
 import com.Rede_Social.Exception.Post.PostNotFoundException;
 import com.Rede_Social.Exception.User.UserNotFoundException;
 import com.Rede_Social.Repository.CommentRepository;
+import com.Rede_Social.Repository.LikeRepository;
 import com.Rede_Social.Repository.PostRepository;
 import com.Rede_Social.Repository.UserRepository;
 import com.Rede_Social.Service.AI.GeminiService;
@@ -13,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +36,9 @@ public class CommentService {
 
     @Autowired
     private GeminiService geminiService;
+
+    @Autowired
+    private LikeRepository likeRepository;
 
     public CommentEntity save(CommentEntity comment) {
         try {
@@ -84,9 +93,15 @@ comment.setPost(post);
         }
     }
 
-    public List<CommentEntity> findAllByPost_Uuid(UUID uuid) {
+    public List<CommentDTO> findAllValidosByPost_Uuid(UUID idPost, UUID idUser) {
         try {
-            return commentRepository.findAllByPost_Uuid(uuid);
+            List<CommentEntity> commentsValidos = commentRepository.commentsValidos(idPost);
+            List<CommentDTO> commentDTOList = new ArrayList<>();
+            for (CommentEntity comment : commentsValidos) {
+                CommentDTO commentDTO = CommentDTOMapper.toCommentDto(comment, idUser, likeRepository);
+                commentDTOList.add(commentDTO);
+            }
+            return commentDTOList;
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os comentarios de um post específico" + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os comentarios de um post específico" + e.getMessage());

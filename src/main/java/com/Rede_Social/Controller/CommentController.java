@@ -1,5 +1,6 @@
 package com.Rede_Social.Controller;
 
+import com.Rede_Social.DTO.Consulta.CommentDTO;
 import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,10 +64,10 @@ public class CommentController {
         }
     }
 
-    @GetMapping("/findAllByPost_Uuid")
-    public ResponseEntity<List<CommentEntity>> findAllByPostId(@RequestParam UUID uuid){
+    @GetMapping("/findAllValidosByPost_Uuid")
+    public ResponseEntity<List<CommentDTO>> findAllByPostId(@RequestParam UUID idPost, @RequestParam UUID idUser){
         try {
-            return ResponseEntity.ok(commentService.findAllByPost_Uuid(uuid));
+            return ResponseEntity.ok(commentService.findAllValidosByPost_Uuid(idPost, idUser));
         } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
