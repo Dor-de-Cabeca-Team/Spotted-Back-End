@@ -8,6 +8,7 @@ import com.Rede_Social.Repository.ComplaintRepository;
 import com.Rede_Social.Repository.LikeRepository;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class CommentDTOMapper {
     public static CommentDTO toCommentDto(CommentEntity commentEntity, UUID idUser, LikeRepository likeRepository, ComplaintRepository complaintRepository) {
@@ -21,7 +22,8 @@ public class CommentDTOMapper {
                 isReported,
                 commentEntity.getConteudo(),
                 commentEntity.getLikes() != null ? commentEntity.getLikes().size() : 0,
-                commentEntity.getProfileAnimal()
+                commentEntity.getProfileAnimal(),
+                commentEntity.getPost().getUuid()
         );
     }
 }

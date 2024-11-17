@@ -1,11 +1,13 @@
 package com.Rede_Social.DTO.Consulta;
 
+import com.Rede_Social.Entity.PostEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -20,4 +22,5 @@ public class CommentDTO {
     private String conteudo;
     private int likeCount;
     private Integer profileAnimal;
+    private UUID post;
 }
