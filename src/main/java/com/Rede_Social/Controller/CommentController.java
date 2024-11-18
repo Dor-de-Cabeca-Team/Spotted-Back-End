@@ -5,6 +5,7 @@ import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,6 +65,7 @@ public class CommentController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/findAllValidosByPost_Uuid")
     public ResponseEntity<List<CommentDTO>> findAllByPostId(@RequestParam UUID idPost, @RequestParam UUID idUser){
         try {
