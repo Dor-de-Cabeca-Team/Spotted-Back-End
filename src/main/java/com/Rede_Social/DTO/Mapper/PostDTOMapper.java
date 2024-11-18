@@ -1,5 +1,6 @@
 package com.Rede_Social.DTO.Mapper;
 
+import com.Rede_Social.DTO.Consulta.CommentDTO;
 import com.Rede_Social.DTO.Consulta.PostDTO;
 import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Entity.PostEntity;
@@ -10,6 +11,7 @@ import com.Rede_Social.Repository.LikeRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class PostDTOMapper {
 
@@ -20,8 +22,10 @@ public class PostDTOMapper {
         List<UUID> tagIds = postEntity.getTags() != null ?
                 postEntity.getTags().stream().map(TagEntity::getUuid).toList() : new ArrayList<>();
 
-        List<UUID> commentIds = postEntity.getComments() != null ?
-                postEntity.getComments().stream().map(CommentEntity::getUuid).toList() : new ArrayList<>();
+        List<CommentDTO> commentDTOS = postEntity.getComments() != null ?
+                postEntity.getComments().stream()
+                        .map(commentEntity -> CommentDTOMapper.toCommentDto(commentEntity, idUser, likeRepository, complaintRepository))
+                        .collect(Collectors.toList()) : new ArrayList<>();
 
         return new PostDTO(
                 postEntity.getUuid(),
@@ -33,7 +37,7 @@ public class PostDTOMapper {
                 postEntity.getProfileAnimal(),
                 postEntity.getUser() != null ? postEntity.getUser().getUuid() : null,
                 tagIds,
-                commentIds
+                commentDTOS
         );
     }
 }
