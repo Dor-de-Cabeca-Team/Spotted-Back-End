@@ -23,5 +23,4 @@ public class CommentDTO {
     private int likeCount;
     private Integer profileAnimal;
     private UUID post;
-    private UUID user;
 }

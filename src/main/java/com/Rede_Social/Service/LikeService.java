@@ -10,7 +10,6 @@ import com.Rede_Social.Repository.CommentRepository;
 import com.Rede_Social.Repository.LikeRepository;
 import com.Rede_Social.Repository.PostRepository;
 import com.Rede_Social.Repository.UserRepository;
-import org.hibernate.annotations.Array;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

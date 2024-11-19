@@ -6,12 +6,8 @@ import com.Rede_Social.Entity.UserEntity;
 public class UserDTOMapper {
     public static UserDTO toUserDto(UserEntity userEntity) {
         return new UserDTO(
-                userEntity.getNome(),
-                userEntity.getEmail(),
-                userEntity.getSenha(),
-                userEntity.getIdade(),
-                userEntity.getAtivo(),
-                userEntity.getRole()
+                userEntity.getUuid(),
+                userEntity.getEmail()
         );
     }
 }

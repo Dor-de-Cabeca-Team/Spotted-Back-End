@@ -1,6 +1,7 @@
 package com.Rede_Social.Controller;
 
 import com.Rede_Social.DTO.Consulta.CommentDTO;
+import com.Rede_Social.DTO.Criacao.CommentCriacaoDTO;
 import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,28 +21,9 @@ public class CommentController {
     private CommentService commentService;
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody CommentDTO comment) {
+    public ResponseEntity<String> save(@RequestBody CommentCriacaoDTO comment) {
         try {
             return ResponseEntity.ok(commentService.save(comment));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-
-    @PutMapping("/update")
-    public ResponseEntity<String> update(@RequestBody CommentDTO comment, @RequestParam UUID uuid) {
-        try {
-            return ResponseEntity.ok(commentService.update(comment, uuid));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
-        try {
-            return ResponseEntity.ok(commentService.delete(uuid));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -75,3 +57,20 @@ public class CommentController {
         }
     }
 }
+//    @PutMapping("/update")
+//    public ResponseEntity<String> update(@RequestBody CommentDTO comment, @RequestParam UUID uuid) {
+//        try {
+//            return ResponseEntity.ok(commentService.update(comment, uuid));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
+//
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
+//        try {
+//            return ResponseEntity.ok(commentService.delete(uuid));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }

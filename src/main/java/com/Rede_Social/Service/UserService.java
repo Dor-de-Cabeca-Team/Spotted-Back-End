@@ -1,6 +1,7 @@
 package com.Rede_Social.Service;
 
 import com.Rede_Social.DTO.Consulta.UserDTO;
+import com.Rede_Social.DTO.Criacao.UserCriacaoDTO;
 import com.Rede_Social.DTO.Mapper.UserDTOMapper;
 import com.Rede_Social.Entity.EmailEntity;
 import com.Rede_Social.Entity.Enum.Role;
@@ -24,15 +25,15 @@ public class UserService {
     @Autowired
     private EmailService emailService;
 
-    public String save(UserDTO user) {
+    public String save(UserCriacaoDTO user) {
         try {
             UserEntity userEntity = new UserEntity();
-            userEntity.setNome(user.getNome());
-            userEntity.setEmail(user.getEmail());
-            userEntity.setSenha(user.getSenha());
-            userEntity.setIdade(user.getIdade());
-            userEntity.setRole(user.getRole() != null ? user.getRole() : Role.USUARIO);
-            userEntity.setAtivo(user.isActivated());
+            userEntity.setNome(user.nome());
+            userEntity.setEmail(user.email());
+            userEntity.setSenha(user.senha());
+            userEntity.setIdade(user.idade());
+            userEntity.setRole(Role.USUARIO);
+            userEntity.setAtivo(false);
 
 
             if (userEntity.getEmail() != null && !userEntity.getEmail().isEmpty()) {
@@ -49,15 +50,13 @@ public class UserService {
         }
     }
 
-    public String update(UserDTO user, UUID uuid) {
+    public String update(UserCriacaoDTO user, UUID uuid) {
         try {
             UserEntity existingUser = userRepository.findById(uuid).orElseThrow(UserNotFoundException::new);
-            existingUser.setNome(user.getNome());
-            existingUser.setIdade(user.getIdade());
-            existingUser.setEmail(user.getEmail());
-            existingUser.setSenha(user.getSenha());
-            existingUser.setRole(user.getRole());
-            existingUser.setAtivo(user.isActivated());
+            existingUser.setNome(user.nome());
+            existingUser.setIdade(user.idade());
+            existingUser.setEmail(user.email());
+            existingUser.setSenha(user.senha());
 
             userRepository.save(existingUser);
 
@@ -113,11 +112,11 @@ public class UserService {
         return false;
     }
 
-    public UserDTO loginProvisorio(String email, String senha) {
+    public String loginProvisorio(String email, String senha) {
         try {
             UserEntity user = userRepository.findByEmailAndSenha(email, senha).orElseThrow(UserNotFoundException::new);
 
-            return UserDTOMapper.toUserDto(user);
+            return "Logado";
         } catch (UserNotFoundException e) {
             throw e;
         } catch (Exception e) {

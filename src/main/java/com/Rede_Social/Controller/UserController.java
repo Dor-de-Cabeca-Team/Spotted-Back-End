@@ -1,6 +1,7 @@
 package com.Rede_Social.Controller;
 
 import com.Rede_Social.DTO.Consulta.UserDTO;
+import com.Rede_Social.DTO.Criacao.UserCriacaoDTO;
 import com.Rede_Social.Entity.UserEntity;
 import com.Rede_Social.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody UserDTO user) {
+    public ResponseEntity<String> save(@RequestBody UserCriacaoDTO user) {
         try {
             return ResponseEntity.ok(userService.save(user));
         } catch (Exception e) {
@@ -28,7 +29,7 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<String> update(@RequestBody UserDTO user, @RequestParam UUID uuid) {
+    public ResponseEntity<String> update(@RequestBody UserCriacaoDTO user, @RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(userService.update(user, uuid));
         } catch (Exception e) {
@@ -74,7 +75,7 @@ public class UserController {
     }
 
     @PostMapping("/login-provisorio")
-    public ResponseEntity<UserDTO> loginProvisorio(@RequestParam String email, @RequestParam String senha) {
+    public ResponseEntity<String> loginProvisorio(@RequestParam String email, @RequestParam String senha) {
         try {
             return ResponseEntity.ok(userService.loginProvisorio(email,senha));
         } catch (Exception e) {

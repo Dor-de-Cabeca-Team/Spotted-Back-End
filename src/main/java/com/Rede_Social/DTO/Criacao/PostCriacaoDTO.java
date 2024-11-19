@@ -1,4 +1,4 @@
-package com.Rede_Social.DTO.Criação;
+package com.Rede_Social.DTO.Criacao;
 
 import java.util.List;
 import java.util.UUID;

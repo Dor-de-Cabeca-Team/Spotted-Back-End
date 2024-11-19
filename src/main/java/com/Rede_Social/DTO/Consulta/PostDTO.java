@@ -21,7 +21,6 @@ public class PostDTO {
     private int likeCount;
     private Instant data;
     private Integer profileAnimal;
-    private UUID userId;
-    private List<UUID> tagsId;
+    private List<TagDTO> tags;
     private List<CommentDTO> comments;
 }

@@ -2,7 +2,7 @@ package com.Rede_Social.Service;
 
 import com.Rede_Social.DTO.Consulta.PostDTO;
 import com.Rede_Social.DTO.Consulta.Top10PostsComLike.PostConsultaTop10DTO;
-import com.Rede_Social.DTO.Criação.PostCriacaoDTO;
+import com.Rede_Social.DTO.Criacao.PostCriacaoDTO;
 import com.Rede_Social.DTO.Mapper.PostDTOMapper;
 import com.Rede_Social.DTO.Mapper.Top10PostsComLike.PostTop10Mapper;
 import com.Rede_Social.Entity.*;
@@ -44,35 +44,9 @@ public class PostService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public String save(PostDTO post) {
-        try {
-            UserEntity user = userRepository.findById(post.getUserId()).orElseThrow(UserNotFoundException::new);
+//    }
 
-            List<UUID> tagsId = post.getTagsId();
-
-            PostEntity postEntity = new PostEntity();
-            postEntity.setConteudo(post.getConteudo());
-            postEntity.setData(Instant.now());
-            postEntity.setValido(geminiService.validadeAI(post.getConteudo()));
-            postEntity.setUser(user);
-
-            if(tagsId != null && !tagsId.isEmpty()) {
-                List<TagEntity> tags = tagRepository.findAllById(tagsId);
-                postEntity.setTags(tags);
-            }
-
-            postRepository.save(postEntity);
-
-            return "Post Criado";
-        } catch (UserNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            System.out.println("Erro no service, não deu para salvar o post no repository: " + e.getMessage());
-            throw new RuntimeException("Erro no service, não deu para salvar o post no repository: " + e.getMessage());
-        }
-    }
-
-    public String save2(PostCriacaoDTO post) {
+    public String save(PostCriacaoDTO post) {
         try {
             UserEntity usuario = userRepository.findById(post.userId()).orElseThrow(UserNotFoundException::new);
 
@@ -106,36 +80,6 @@ public class PostService {
         }
     }
 
-    public String update(PostDTO post, UUID uuid) {
-        try {
-            PostEntity existingPost = postRepository.findById(uuid)
-                    .orElseThrow(() -> new RuntimeException("Post não existe no banco"));
-            existingPost.setConteudo(post.getConteudo());
-            existingPost.setValido(geminiService.validadeAI(post.getConteudo()));
-
-            if (post.getTagsId() != null && !post.getTagsId().isEmpty()) {
-                List<TagEntity> updatedTags = tagRepository.findAllById(post.getTagsId());
-                existingPost.setTags(updatedTags);
-            }
-
-            PostEntity updatedPost = postRepository.save(existingPost);
-
-            return "Post atualizado";
-        } catch (Exception e) {
-            System.out.println("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());
-            throw new RuntimeException("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());
-        }
-    }
-
-    public String delete(UUID uuid) {
-        try {
-            postRepository.deleteById(uuid);
-            return "Post deletado";
-        } catch (Exception e) {
-            System.out.println("Erro no service, não deu para deletar o post no repository: " + e.getMessage());
-            throw new RuntimeException("Erro no service, não deu para deletar o post no repository: " + e.getMessage());
-        }
-    }
 
     public PostDTO findById(UUID uuid) {
         PostEntity post = postRepository.findById(uuid).orElseThrow(PostNotFoundException::new);
@@ -310,3 +254,63 @@ public class PostService {
         }
     }
 }
+//    public String save(PostDTO post) {
+//        try {
+//            UserEntity user = userRepository.findById(post.getUserId()).orElseThrow(UserNotFoundException::new);
+//
+//            List<UUID> tagsId = post.getTagsId();
+//
+//            PostEntity postEntity = new PostEntity();
+//            postEntity.setConteudo(post.getConteudo());
+//            postEntity.setData(Instant.now());
+//            postEntity.setValido(geminiService.validadeAI(post.getConteudo()));
+//            postEntity.setUser(user);
+//
+//            if(tagsId != null && !tagsId.isEmpty()) {
+//                List<TagEntity> tags = tagRepository.findAllById(tagsId);
+//                postEntity.setTags(tags);
+//            }
+//
+//            postRepository.save(postEntity);
+//
+//            return "Post Criado";
+//        } catch (UserNotFoundException e) {
+//            throw e;
+//        } catch (Exception e) {
+//            System.out.println("Erro no service, não deu para salvar o post no repository: " + e.getMessage());
+//            throw new RuntimeException("Erro no service, não deu para salvar o post no repository: " + e.getMessage());
+//        }
+//
+//    public String update(PostCriacaoDTO post, UUID uuid) {
+//        try {
+//            PostEntity existingPost = postRepository.findById(uuid)
+//                    .orElseThrow(() -> new RuntimeException("Post não existe no banco"));
+//            existingPost.setConteudo(post.conteudo());
+//            existingPost.setValido(geminiService.validadeAI(post.conteudo()));
+//
+//            List<TagEntity> tagEntities = post.tags().stream()
+//                    .map(dto -> {
+//                        return tagRepository.findByNome(dto.nome())
+//                                .orElseGet(() -> new TagEntity(dto.nome()));
+//                    })
+//                    .toList();
+//            existingPost.setTags(tagEntities);
+//
+//            PostEntity updatedPost = postRepository.save(existingPost);
+//
+//            return "Post atualizado";
+//        } catch (Exception e) {
+//            System.out.println("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());
+//            throw new RuntimeException("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());
+//        }
+//    }
+//
+//    public String delete(UUID uuid) {
+//        try {
+//            postRepository.deleteById(uuid);
+//            return "Post deletado";
+//        } catch (Exception e) {
+//            System.out.println("Erro no service, não deu para deletar o post no repository: " + e.getMessage());
+//            throw new RuntimeException("Erro no service, não deu para deletar o post no repository: " + e.getMessage());
+//        }
+//    }

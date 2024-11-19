@@ -2,6 +2,7 @@ package com.Rede_Social.DTO.Mapper;
 
 import com.Rede_Social.DTO.Consulta.CommentDTO;
 import com.Rede_Social.DTO.Consulta.PostDTO;
+import com.Rede_Social.DTO.Consulta.TagDTO;
 import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Entity.PostEntity;
 import com.Rede_Social.Entity.TagEntity;
@@ -19,8 +20,10 @@ public class PostDTOMapper {
         boolean isLiked = likeRepository.findByPostAndUser(postEntity.getUuid(), idUser).isPresent();
         boolean isReported = complaintRepository.findByCommentAndUser(postEntity.getUuid(), idUser).isPresent();
 
-        List<UUID> tagIds = postEntity.getTags() != null ?
-                postEntity.getTags().stream().map(TagEntity::getUuid).toList() : new ArrayList<>();
+        List<TagDTO> tagDTOS = postEntity.getTags() != null ?
+                postEntity.getTags().stream()
+                        .map(tagEntity -> TagDTOMapper.toTagDto(tagEntity, idUser, likeRepository, complaintRepository))
+                        .collect(Collectors.toList()) : new ArrayList<>();
 
         List<CommentDTO> commentDTOS = postEntity.getComments() != null ?
                 postEntity.getComments().stream()
@@ -35,8 +38,7 @@ public class PostDTOMapper {
                 postEntity.getLikes() != null ? postEntity.getLikes().size() : 0,
                 postEntity.getData(),
                 postEntity.getProfileAnimal(),
-                postEntity.getUser() != null ? postEntity.getUser().getUuid() : null,
-                tagIds,
+                tagDTOS,
                 commentDTOS
         );
     }

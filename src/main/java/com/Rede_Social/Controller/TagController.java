@@ -28,24 +28,6 @@ public class TagController {
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<String> update(@RequestBody TagDTO tag, @RequestParam UUID uuid) {
-        try {
-            return ResponseEntity.ok(tagService.update(tag, uuid));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
-        try {
-            return ResponseEntity.ok(tagService.delete(uuid));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
     @GetMapping("/findById")
     public ResponseEntity<TagDTO> findById(@RequestParam UUID uuid) {
         try {
@@ -64,3 +46,20 @@ public class TagController {
         }
     }
 }
+//    @PutMapping("/update")
+//    public ResponseEntity<String> update(@RequestBody TagDTO tag, @RequestParam UUID uuid) {
+//        try {
+//            return ResponseEntity.ok(tagService.update(tag, uuid));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
+//
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
+//        try {
+//            return ResponseEntity.ok(tagService.delete(uuid));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }

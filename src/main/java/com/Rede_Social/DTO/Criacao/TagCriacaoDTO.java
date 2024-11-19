@@ -1,4 +1,4 @@
-package com.Rede_Social.DTO.Criação;
+package com.Rede_Social.DTO.Criacao;
 
 public record TagCriacaoDTO(String nome) {
 }

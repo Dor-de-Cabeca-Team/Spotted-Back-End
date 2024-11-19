@@ -1,20 +1,6 @@
 package com.Rede_Social.DTO.Consulta;
 
-import com.Rede_Social.Entity.Enum.Role;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.UUID;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class UserDTO {
-    String nome;
-    String email;
-    String senha;
-    Integer idade;
-    boolean activated;
-    Role role;
+public record UserDTO(UUID id, String email) {
 }

@@ -1,7 +1,6 @@
 package com.Rede_Social.Controller;
 
 import com.Rede_Social.DTO.Consulta.ComplaintDTO;
-import com.Rede_Social.Entity.ComplaintEntity;
 import com.Rede_Social.Service.ComplaintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,24 +26,6 @@ public class ComplaintController {
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<String> update(@RequestBody ComplaintDTO complaint, @RequestParam UUID uuid) {
-        try {
-            return ResponseEntity.ok(complaintService.update(complaint, uuid));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
-        try {
-            return ResponseEntity.ok(complaintService.delete(uuid));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
     @GetMapping("/findById")
     public ResponseEntity<ComplaintDTO> findById(@RequestParam UUID uuid) {
         try {
@@ -63,3 +44,20 @@ public class ComplaintController {
         }
     }
 }
+//    @PutMapping("/update")
+//    public ResponseEntity<String> update(@RequestBody ComplaintCriacaoDTO complaint, @RequestParam UUID uuid) {
+//        try {
+//            return ResponseEntity.ok(complaintService.update(complaint, uuid));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
+//
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
+//        try {
+//            return ResponseEntity.ok(complaintService.delete(uuid));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
