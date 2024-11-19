@@ -45,7 +45,7 @@ public class PostEntity {
     @JsonIgnoreProperties({"complaints", "likes", "comments", "posts", "senha"})
     private UserEntity user;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "post_tag",
             joinColumns = @JoinColumn(name = "post_id"),

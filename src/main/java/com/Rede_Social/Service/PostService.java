@@ -1,7 +1,10 @@
 package com.Rede_Social.Service;
 
 import com.Rede_Social.DTO.Consulta.PostDTO;
+import com.Rede_Social.DTO.Consulta.Top10PostsComLike.PostConsultaTop10DTO;
+import com.Rede_Social.DTO.Criação.PostCriacaoDTO;
 import com.Rede_Social.DTO.Mapper.PostDTOMapper;
+import com.Rede_Social.DTO.Mapper.Top10PostsComLike.PostTop10Mapper;
 import com.Rede_Social.Entity.*;
 import com.Rede_Social.Exception.Post.PostNotFoundException;
 import com.Rede_Social.Exception.User.UserNotFoundException;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -56,6 +60,40 @@ public class PostService {
                 List<TagEntity> tags = tagRepository.findAllById(tagsId);
                 postEntity.setTags(tags);
             }
+
+            postRepository.save(postEntity);
+
+            return "Post Criado";
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            System.out.println("Erro no service, não deu para salvar o post no repository: " + e.getMessage());
+            throw new RuntimeException("Erro no service, não deu para salvar o post no repository: " + e.getMessage());
+        }
+    }
+
+    public String save2(PostCriacaoDTO post) {
+        try {
+            UserEntity usuario = userRepository.findById(post.userId()).orElseThrow(UserNotFoundException::new);
+
+            PostEntity postEntity = new PostEntity();
+
+            postEntity.setUser(usuario);
+
+            postEntity.setConteudo(post.conteudo());
+
+            postEntity.setValido(geminiService.validadeAI(post.conteudo()));
+
+            postEntity.setData(Instant.now());
+
+            List<TagEntity> tagEntities = post.tags().stream()
+                    .map(dto -> {
+                        return tagRepository.findByNome(dto.nome())
+                                .orElseGet(() -> new TagEntity(dto.nome()));
+                    })
+                    .toList();
+
+            postEntity.setTags(tagEntities);
 
             postRepository.save(postEntity);
 
@@ -224,20 +262,19 @@ public class PostService {
         }
     }
 
-    public List<PostDTO> Top10PostsComLike() {
+    public List<PostConsultaTop10DTO> Top10PostsComLike() {
         try {
             List<PostEntity> posts = postRepository.Top10PostsComLike();
-            List<PostDTO> postDTOList = new ArrayList<>();
-            for (PostEntity post : posts) {
-                PostDTO postDto = PostDTOMapper.toPostDto(post, null, likeRepository, complaintRepository);
-                postDTOList.add(postDto);
-            }
-            return postDTOList;
+
+            return posts.stream()
+                    .map(PostTop10Mapper::toPostConsultaDTO)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
         }
     }
+
 
     public PostDTO postMaisCurtidoDaSemana(){
         try{

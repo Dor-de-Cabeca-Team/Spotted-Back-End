@@ -1,6 +1,8 @@
 package com.Rede_Social.Controller;
 
 import com.Rede_Social.DTO.Consulta.PostDTO;
+import com.Rede_Social.DTO.Consulta.Top10PostsComLike.PostConsultaTop10DTO;
+import com.Rede_Social.DTO.Criação.PostCriacaoDTO;
 import com.Rede_Social.DTO.Mapper.PostDTOMapper;
 import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Entity.PostEntity;
@@ -24,10 +26,11 @@ public class PostController {
     @Autowired
     private CommentService commentService;
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody PostDTO post) {
+    public ResponseEntity<String> save(@RequestBody PostCriacaoDTO post) {
         try {
-            return ResponseEntity.ok(postService.save(post));
+            return ResponseEntity.ok(postService.save2(post));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -122,7 +125,7 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/top10PostsComLike")
-    public ResponseEntity<List<PostDTO>> Top10PostsComLike() {
+    public ResponseEntity<List<PostConsultaTop10DTO>> Top10PostsComLike() {
         try {
             return ResponseEntity.ok(postService.Top10PostsComLike());
         } catch (Exception e) {
