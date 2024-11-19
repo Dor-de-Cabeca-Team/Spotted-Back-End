@@ -35,10 +35,6 @@ public class PostEntity {
     private boolean valido;
 
     private Integer profileAnimal;
-    @PrePersist
-    private void assignRandomProfileAnimal() {
-        this.profileAnimal = ThreadLocalRandom.current().nextInt(1, 21);
-    }
 
     @ManyToOne
     @JoinColumn(name = "user_id")

@@ -12,6 +12,7 @@ import com.Rede_Social.Exception.Post.PostNotFoundException;
 import com.Rede_Social.Exception.User.UserNotFoundException;
 import com.Rede_Social.Repository.*;
 import com.Rede_Social.Service.AI.GeminiService;
+import jakarta.persistence.PrePersist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class CommentService {
@@ -52,6 +54,9 @@ public class CommentService {
             commentEntity.setData(Instant.now());
             commentEntity.setUser(user);
             commentEntity.setPost(post);
+
+            commentEntity.setProfileAnimal(ThreadLocalRandom.current().nextInt(1, 21));
+
 
             commentRepository.save(commentEntity);
 

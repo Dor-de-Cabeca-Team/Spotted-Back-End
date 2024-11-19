@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,6 +67,8 @@ public class PostService {
                                 .orElseGet(() -> new TagEntity(dto.nome()));
                     })
                     .toList();
+
+            postEntity.setProfileAnimal(ThreadLocalRandom.current().nextInt(1, 21));
 
             postEntity.setTags(tagEntities);
 
