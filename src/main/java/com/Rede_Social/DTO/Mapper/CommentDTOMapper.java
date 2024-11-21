@@ -1,14 +1,14 @@
 package com.Rede_Social.DTO.Mapper;
 
 import com.Rede_Social.DTO.Consulta.CommentDTO;
-import com.Rede_Social.DTO.Consulta.PostDTO;
 import com.Rede_Social.Entity.CommentEntity;
-import com.Rede_Social.Entity.PostEntity;
 import com.Rede_Social.Repository.ComplaintRepository;
 import com.Rede_Social.Repository.LikeRepository;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 
 public class CommentDTOMapper {
     public static CommentDTO toCommentDto(CommentEntity commentEntity, UUID idUser, LikeRepository likeRepository, ComplaintRepository complaintRepository) {
@@ -25,5 +25,10 @@ public class CommentDTOMapper {
                 commentEntity.getProfileAnimal(),
                 commentEntity.getPost().getUuid()
         );
+    }
+    public static List<CommentDTO> toCommentDtoList(List<CommentEntity> commentEntities, UUID idUser, LikeRepository likeRepository, ComplaintRepository complaintRepository) {
+        return commentEntities.stream()
+                .map(comment -> toCommentDto(comment, idUser, likeRepository, complaintRepository))
+                .collect(Collectors.toList());
     }
 }

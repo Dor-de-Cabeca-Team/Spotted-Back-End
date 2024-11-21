@@ -1,6 +1,6 @@
 package com.Rede_Social.Controller;
 
-import com.Rede_Social.DTO.Consulta.ComplaintDTO;
+import com.Rede_Social.Entity.ComplaintEntity;
 import com.Rede_Social.Service.ComplaintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,14 +11,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/complaint")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ComplaintController {
 
     @Autowired
     private ComplaintService complaintService;
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody ComplaintDTO complaint) {
+    public ResponseEntity<ComplaintEntity> save(@RequestBody ComplaintEntity complaint) {
         try {
             return ResponseEntity.ok(complaintService.save(complaint));
         } catch (Exception e) {
@@ -26,8 +26,26 @@ public class ComplaintController {
         }
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<ComplaintEntity> update(@RequestBody ComplaintEntity complaint, @RequestParam UUID uuid) {
+        try {
+            return ResponseEntity.ok(complaintService.update(complaint, uuid));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
+        try {
+            return ResponseEntity.ok(complaintService.delete(uuid));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/findById")
-    public ResponseEntity<ComplaintDTO> findById(@RequestParam UUID uuid) {
+    public ResponseEntity<ComplaintEntity> findById(@RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(complaintService.findById(uuid));
         } catch (Exception e) {
@@ -36,7 +54,7 @@ public class ComplaintController {
     }
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<ComplaintDTO>> findAll() {
+    public ResponseEntity<List<ComplaintEntity>> findAll() {
         try {
             return ResponseEntity.ok(complaintService.findAll());
         } catch (Exception e) {
@@ -44,20 +62,3 @@ public class ComplaintController {
         }
     }
 }
-//    @PutMapping("/update")
-//    public ResponseEntity<String> update(@RequestBody ComplaintCriacaoDTO complaint, @RequestParam UUID uuid) {
-//        try {
-//            return ResponseEntity.ok(complaintService.update(complaint, uuid));
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().build();
-//        }
-//    }
-//
-//    @DeleteMapping("/delete")
-//    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
-//        try {
-//            return ResponseEntity.ok(complaintService.delete(uuid));
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().build();
-//        }
-//    }

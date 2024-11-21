@@ -209,12 +209,12 @@ public class PostService {
         }
     }
 
-    public List<PostConsultaTop10DTO> Top10PostsComLike() {
+    public List<PostConsultaTop10DTO> Top10PostsComLike(UUID idUser) {
         try {
             List<PostEntity> posts = postRepository.Top10PostsComLike();
 
             return posts.stream()
-                    .map(PostTop10Mapper::toPostConsultaDTO)
+                    .map(post -> PostTop10Mapper.toPostConsultaDTO(post, idUser, likeRepository, complaintRepository))
                     .collect(Collectors.toList());
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());

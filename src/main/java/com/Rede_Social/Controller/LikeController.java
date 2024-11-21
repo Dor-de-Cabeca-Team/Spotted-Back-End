@@ -1,6 +1,6 @@
 package com.Rede_Social.Controller;
 
-import com.Rede_Social.DTO.Consulta.LikeDTO;
+import com.Rede_Social.Entity.LikeEntity;
 import com.Rede_Social.Service.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,14 +11,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/like")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200")
 public class LikeController {
 
     @Autowired
     private LikeService likeService;
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody LikeDTO like) {
+    public ResponseEntity<LikeEntity> save(@RequestBody LikeEntity like) {
         try {
             return ResponseEntity.ok(likeService.save(like));
         } catch (Exception e) {
@@ -26,8 +26,26 @@ public class LikeController {
         }
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<LikeEntity> update(@RequestBody LikeEntity like, @RequestParam UUID uuid) {
+        try {
+            return ResponseEntity.ok(likeService.update(like, uuid));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
+        try {
+            return ResponseEntity.ok(likeService.delete(uuid));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/findById")
-    public ResponseEntity<LikeDTO> findById(@RequestParam UUID uuid) {
+    public ResponseEntity<LikeEntity> findById(@RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(likeService.findById(uuid));
         } catch (Exception e) {
@@ -36,7 +54,7 @@ public class LikeController {
     }
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<LikeDTO>> findAll() {
+    public ResponseEntity<List<LikeEntity>> findAll() {
         try {
             return ResponseEntity.ok(likeService.findAll());
         } catch (Exception e) {
@@ -44,20 +62,3 @@ public class LikeController {
         }
     }
 }
-//    @PutMapping("/update")
-//    public ResponseEntity<String> update(@RequestBody LikeCriacaoDTO like, @RequestParam UUID uuid) {
-//        try {
-//            return ResponseEntity.ok(likeService.update(like, uuid));
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().build();
-//        }
-//    }
-//
-//    @DeleteMapping("/delete")
-//    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
-//        try {
-//            return ResponseEntity.ok(likeService.delete(uuid));
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().build();
-//        }
-//    }

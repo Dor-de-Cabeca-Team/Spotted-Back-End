@@ -8,6 +8,7 @@ import com.Rede_Social.Service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -103,13 +104,18 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/top10PostsComLike")
-    public ResponseEntity<List<PostConsultaTop10DTO>> Top10PostsComLike() {
+    public ResponseEntity<List<PostConsultaTop10DTO>> Top10PostsComLike(@RequestParam UUID idUser) {
         try {
-            return ResponseEntity.ok(postService.Top10PostsComLike());
+
+            List<PostConsultaTop10DTO> top10Posts = postService.Top10PostsComLike(idUser);
+
+            return ResponseEntity.ok(top10Posts);
         } catch (Exception e) {
+            System.out.println("Erro no controller: " + e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
+
 
     @GetMapping("/maisCurtidoDaSemana")
     public ResponseEntity<PostDTO> postMaisCurtidoDaSemana(){
