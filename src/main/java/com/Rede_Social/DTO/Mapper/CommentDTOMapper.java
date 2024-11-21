@@ -26,9 +26,4 @@ public class CommentDTOMapper {
                 commentEntity.getPost().getUuid()
         );
     }
-    public static List<CommentDTO> toCommentDtoList(List<CommentEntity> commentEntities, UUID idUser, LikeRepository likeRepository, ComplaintRepository complaintRepository) {
-        return commentEntities.stream()
-                .map(comment -> toCommentDto(comment, idUser, likeRepository, complaintRepository))
-                .collect(Collectors.toList());
-    }
 }

@@ -104,14 +104,10 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/top10PostsComLike")
-    public ResponseEntity<List<PostConsultaTop10DTO>> Top10PostsComLike(@RequestParam UUID idUser) {
+    public ResponseEntity<List<PostConsultaTop10DTO>> Top10PostsComLike() {
         try {
-
-            List<PostConsultaTop10DTO> top10Posts = postService.Top10PostsComLike(idUser);
-
-            return ResponseEntity.ok(top10Posts);
+            return ResponseEntity.ok(postService.Top10PostsComLike());
         } catch (Exception e) {
-            System.out.println("Erro no controller: " + e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
