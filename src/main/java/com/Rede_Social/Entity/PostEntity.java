@@ -35,17 +35,13 @@ public class PostEntity {
     private boolean valido;
 
     private Integer profileAnimal;
-    @PrePersist
-    private void assignRandomProfileAnimal() {
-        this.profileAnimal = ThreadLocalRandom.current().nextInt(1, 21);
-    }
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnoreProperties({"complaints", "likes", "comments", "posts", "senha"})
     private UserEntity user;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "post_tag",
             joinColumns = @JoinColumn(name = "post_id"),

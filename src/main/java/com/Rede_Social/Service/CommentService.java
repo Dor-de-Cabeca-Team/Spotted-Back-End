@@ -1,20 +1,26 @@
 package com.Rede_Social.Service;
 
+import com.Rede_Social.DTO.Consulta.CommentDTO;
+import com.Rede_Social.DTO.Consulta.PostDTO;
+import com.Rede_Social.DTO.Criacao.CommentCriacaoDTO;
+import com.Rede_Social.DTO.Mapper.CommentDTOMapper;
+import com.Rede_Social.DTO.Mapper.PostDTOMapper;
 import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Entity.PostEntity;
 import com.Rede_Social.Entity.UserEntity;
 import com.Rede_Social.Exception.Post.PostNotFoundException;
 import com.Rede_Social.Exception.User.UserNotFoundException;
-import com.Rede_Social.Repository.CommentRepository;
-import com.Rede_Social.Repository.PostRepository;
-import com.Rede_Social.Repository.UserRepository;
+import com.Rede_Social.Repository.*;
 import com.Rede_Social.Service.AI.GeminiService;
+import jakarta.persistence.PrePersist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class CommentService {
@@ -31,65 +37,102 @@ public class CommentService {
     @Autowired
     private GeminiService geminiService;
 
-    public CommentEntity save(CommentEntity comment) {
+    @Autowired
+    private LikeRepository likeRepository;
+
+    @Autowired
+    private ComplaintRepository complaintRepository;
+
+    public String save(CommentCriacaoDTO comment) {
         try {
-            UserEntity user = userRepository.findById(comment.getUser().getUuid()).orElseThrow(UserNotFoundException::new);
-            PostEntity post = postRepository.findById(comment.getPost().getUuid()).orElseThrow(PostNotFoundException::new);
+            UserEntity user = userRepository.findById(comment.user()).orElseThrow(UserNotFoundException::new);
+            PostEntity post = postRepository.findById(comment.post()).orElseThrow(PostNotFoundException::new);
 
-            System.out.println(comment);
-            comment.setValido(geminiService.validadeAI(comment.getConteudo()));
+            CommentEntity commentEntity = new CommentEntity();
+            commentEntity.setConteudo(comment.conteudo());
+            commentEntity.setValido(geminiService.validadeAI(commentEntity.getConteudo()));
+            commentEntity.setData(Instant.now());
+            commentEntity.setUser(user);
+            commentEntity.setPost(post);
 
-            comment.setData(Instant.now());
-comment.setUser(user);
-comment.setPost(post);
-            return commentRepository.save(comment);
+            commentEntity.setProfileAnimal(ThreadLocalRandom.current().nextInt(1, 21));
 
+
+            commentRepository.save(commentEntity);
+
+            return "comentário criado";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar o comentário no repository: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para salvar o comentário no repository: " + e.getMessage());
         }
     }
 
-    public CommentEntity update(CommentEntity comment, UUID uuid) {
-        try {
-            commentRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Comentário não existe no banco"));
-            comment.setUuid(uuid);
-            return commentRepository.save(comment);
-        } catch (Exception e) {
-            System.out.println("Erro no service, não deu para atualizar o comentário no repository: " + e.getMessage());
-            throw new RuntimeException("Erro no service, não deu para atualizar o comentário no repository: " + e.getMessage());
-        }
+    public CommentDTO findById(UUID uuid) {
+        CommentEntity comment = commentRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Comentário não encontrado no banco"));
+        return CommentDTOMapper.toCommentDto(comment, null, likeRepository, complaintRepository);
     }
 
-    public String delete(UUID uuid) {
+    public List<CommentDTO> findAll() {
         try {
-            commentRepository.deleteById(uuid);
-            return "Comentário deletado";
-        } catch (Exception e) {
-            System.out.println("Erro no service, não deu para deletar o comentário no repository: " + e.getMessage());
-            throw new RuntimeException("Erro no service, não deu para deletar o comentário no repository: " + e.getMessage());
-        }
-    }
-
-    public CommentEntity findById(UUID uuid) {
-        return commentRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Comentário não encontrado no banco"));
-    }
-
-    public List<CommentEntity> findAll() {
-        try {
-            return commentRepository.findAll();
+            List<CommentEntity> comments = commentRepository.findAll();
+            List<CommentDTO> commentDTOList = new ArrayList<>();
+            for (CommentEntity comment : comments) {
+                commentDTOList.add(CommentDTOMapper.toCommentDto(comment, null, likeRepository, complaintRepository));
+            }
+            return commentDTOList;
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os comentários do banco: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os comentarios: " + e.getMessage());
         }
     }
 
-    public List<CommentEntity> findAllByPost_Uuid(UUID uuid) {
+    public List<CommentDTO> findAllValidosByPost_Uuid(UUID idPost, UUID idUser) {
         try {
-            return commentRepository.findAllByPost_Uuid(uuid);
+            List<CommentEntity> commentsValidos = commentRepository.commentsValidos(idPost);
+            List<CommentDTO> commentDTOList = new ArrayList<>();
+            boolean like, reported;
+
+            for (CommentEntity comment : commentsValidos) {
+                like = likeRepository.findByCommentAndUser(comment.getUuid(), idUser).isPresent();
+                reported = complaintRepository.findByCommentAndUser(comment.getUuid(), idUser).isPresent();
+                CommentDTO commentDTO = CommentDTOMapper.toCommentDto(comment, idUser, likeRepository, complaintRepository);
+                if(like){
+                    commentDTO.setLiked(true);
+                }
+                if(reported){
+                    commentDTO.setReported(true);
+                }
+                commentDTOList.add(commentDTO);
+            }
+            return commentDTOList;
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os comentarios de um post específico" + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os comentarios de um post específico" + e.getMessage());
         }
     }
 }
+//    public String update(CommentCriacaoDTO comment, UUID uuid) {
+//        try {
+//            CommentEntity existingComment = commentRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
+//
+//            existingComment.setConteudo(comment.conteudo());
+//            existingComment.setValido(geminiService.validadeAI(existingComment.getConteudo()));
+//
+//            commentRepository.save(existingComment);
+//
+//            return "comentário atualizado";
+//        } catch (Exception e) {
+//            System.out.println("Erro no service, não deu para atualizar o comentário no repository: " + e.getMessage());
+//            throw new RuntimeException("Erro no service, não deu para atualizar o comentário no repository: " + e.getMessage());
+//        }
+//    }
+//
+//    public String delete(UUID uuid) {
+//        try {
+//            commentRepository.deleteById(uuid);
+//            return "Comentário deletado";
+//        } catch (Exception e) {
+//            System.out.println("Erro no service, não deu para deletar o comentário no repository: " + e.getMessage());
+//            throw new RuntimeException("Erro no service, não deu para deletar o comentário no repository: " + e.getMessage());
+//        }
+//    }

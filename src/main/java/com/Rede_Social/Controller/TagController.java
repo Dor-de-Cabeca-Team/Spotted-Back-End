@@ -1,5 +1,6 @@
 package com.Rede_Social.Controller;
 
+import com.Rede_Social.DTO.Consulta.TagDTO;
 import com.Rede_Social.Entity.TagEntity;
 import com.Rede_Social.Service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +13,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/tag")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 public class TagController {
 
     @Autowired
     private TagService tagService;
 
     @PostMapping("/save")
-    public ResponseEntity<TagEntity> save(@RequestBody TagEntity tag) {
+    public ResponseEntity<String> save(@RequestBody TagDTO tag) {
         try {
             return ResponseEntity.ok(tagService.save(tag));
         } catch (Exception e) {
@@ -27,26 +28,8 @@ public class TagController {
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<TagEntity> update(@RequestBody TagEntity tag, @RequestParam UUID uuid) {
-        try {
-            return ResponseEntity.ok(tagService.update(tag, uuid));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
-        try {
-            return ResponseEntity.ok(tagService.delete(uuid));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
     @GetMapping("/findById")
-    public ResponseEntity<TagEntity> findById(@RequestParam UUID uuid) {
+    public ResponseEntity<TagDTO> findById(@RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(tagService.findById(uuid));
         } catch (Exception e) {
@@ -55,7 +38,7 @@ public class TagController {
     }
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<TagEntity>> findAll() {
+    public ResponseEntity<List<TagDTO>> findAll() {
         try {
             return ResponseEntity.ok(tagService.findAll());
         } catch (Exception e) {
@@ -63,3 +46,20 @@ public class TagController {
         }
     }
 }
+//    @PutMapping("/update")
+//    public ResponseEntity<String> update(@RequestBody TagDTO tag, @RequestParam UUID uuid) {
+//        try {
+//            return ResponseEntity.ok(tagService.update(tag, uuid));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
+//
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
+//        try {
+//            return ResponseEntity.ok(tagService.delete(uuid));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }

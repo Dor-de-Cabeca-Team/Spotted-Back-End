@@ -1,9 +1,12 @@
 package com.Rede_Social.Controller;
 
+import com.Rede_Social.DTO.Consulta.CommentDTO;
+import com.Rede_Social.DTO.Criacao.CommentCriacaoDTO;
 import com.Rede_Social.Entity.CommentEntity;
 import com.Rede_Social.Service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,14 +14,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/comment")//request
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 public class CommentController {
 
     @Autowired
     private CommentService commentService;
 
     @PostMapping("/save")
-    public ResponseEntity<CommentEntity> save(@RequestBody CommentEntity comment) {
+    public ResponseEntity<String> save(@RequestBody CommentCriacaoDTO comment) {
         try {
             return ResponseEntity.ok(commentService.save(comment));
         } catch (Exception e) {
@@ -26,27 +29,8 @@ public class CommentController {
         }
     }
 
-
-    @PutMapping("/update")
-    public ResponseEntity<CommentEntity> update(@RequestBody CommentEntity comment, @RequestParam UUID uuid) {
-        try {
-            return ResponseEntity.ok(commentService.update(comment, uuid));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
-        try {
-            return ResponseEntity.ok(commentService.delete(uuid));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
     @GetMapping("/findById")
-    public ResponseEntity<CommentEntity> findById(@RequestParam UUID uuid) {
+    public ResponseEntity<CommentDTO> findById(@RequestParam UUID uuid) {
         try {
             return ResponseEntity.ok(commentService.findById(uuid));
         } catch (Exception e) {
@@ -55,7 +39,7 @@ public class CommentController {
     }
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<CommentEntity>> findAll() {
+    public ResponseEntity<List<CommentDTO>> findAll() {
         try {
             return ResponseEntity.ok(commentService.findAll());
         } catch (Exception e) {
@@ -63,12 +47,30 @@ public class CommentController {
         }
     }
 
-    @GetMapping("/findAllByPost_Uuid")
-    public ResponseEntity<List<CommentEntity>> findAllByPostId(@RequestParam UUID uuid){
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
+    @GetMapping("/findAllValidosByPost_Uuid")
+    public ResponseEntity<List<CommentDTO>> findAllByPostId(@RequestParam UUID idPost, @RequestParam UUID idUser){
         try {
-            return ResponseEntity.ok(commentService.findAllByPost_Uuid(uuid));
+            return ResponseEntity.ok(commentService.findAllValidosByPost_Uuid(idPost, idUser));
         } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
     }
 }
+//    @PutMapping("/update")
+//    public ResponseEntity<String> update(@RequestBody CommentDTO comment, @RequestParam UUID uuid) {
+//        try {
+//            return ResponseEntity.ok(commentService.update(comment, uuid));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
+//
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<String> delete(@RequestParam UUID uuid) {
+//        try {
+//            return ResponseEntity.ok(commentService.delete(uuid));
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }

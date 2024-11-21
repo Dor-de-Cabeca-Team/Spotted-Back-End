@@ -36,11 +36,6 @@ public class CommentEntity {
 
     private Integer profileAnimal;
 
-    @PrePersist
-    private void assignRandomProfileAnimal() {
-        this.profileAnimal = ThreadLocalRandom.current().nextInt(1, 21);
-    }
-
     @OneToMany(mappedBy = "comment")
     @JsonIgnoreProperties("comment")  // Evita loop infinito durante a serialização de ComplaintEntity
     private List<ComplaintEntity> complaints = new ArrayList<>();
