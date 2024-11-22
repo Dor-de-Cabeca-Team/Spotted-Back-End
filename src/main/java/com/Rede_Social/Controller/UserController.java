@@ -7,6 +7,7 @@ import com.Rede_Social.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +47,7 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/findById")
     public ResponseEntity<UserDTO> findById(@RequestParam UUID uuid) {
         try {
