@@ -24,6 +24,7 @@ public interface PostRepository extends JpaRepository<PostEntity, UUID> {
     LEFT JOIN comment c ON p.uuid = c.post_id
     WHERE p.valido = true AND (c.valido = true OR c.valido IS NULL)
     ORDER BY p.data DESC
+    LIMIT 50
     """, nativeQuery = true)
     List<PostEntity> PostsValidos();
 }
