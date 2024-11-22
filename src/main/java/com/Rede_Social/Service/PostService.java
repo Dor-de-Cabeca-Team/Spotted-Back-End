@@ -235,27 +235,21 @@ public class PostService {
     public List<PostDTO> PostsValidos(UUID idUser) {
         try {
             List<PostEntity> postsValidos = postRepository.PostsValidos();
-            List<PostDTO> postDTOList = new ArrayList<>();
-            boolean like, reported;
 
-            for (PostEntity post : postsValidos) {
-                like = likeRepository.findByPostAndUser(post.getUuid(), idUser).isPresent();
-                reported = complaintRepository.findByPostAndUser(post.getUuid(), idUser).isPresent();
-                PostDTO postDto = PostDTOMapper.toPostDto(post, idUser, likeRepository, complaintRepository);
-                if(like){
-                    postDto.setLiked(true);
-                }
-                if(reported){
-                    postDto.setReported(true);
-                }
-                postDTOList.add(postDto);
-            }
-            return postDTOList;
+            return postsValidos.stream()
+                    .map(post -> {
+                        PostDTO postDto = PostDTOMapper.toPostDto(post, idUser, likeRepository, complaintRepository);
+                        postDto.setLiked(likeRepository.findByPostAndUser(post.getUuid(), idUser).isPresent());
+                        postDto.setReported(complaintRepository.findByPostAndUser(post.getUuid(), idUser).isPresent());
+                        return postDto;
+                    })
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
         }
     }
+
 }
 //    public String save(PostDTO post) {
 //        try {

@@ -18,15 +18,17 @@ public class PostDTOMapper {
 
     public static PostDTO toPostDto(PostEntity postEntity, UUID idUser, LikeRepository likeRepository, ComplaintRepository complaintRepository) {
         boolean isLiked = likeRepository.findByPostAndUser(postEntity.getUuid(), idUser).isPresent();
-        boolean isReported = complaintRepository.findByCommentAndUser(postEntity.getUuid(), idUser).isPresent();
+        boolean isReported = complaintRepository.findByPostAndUser(postEntity.getUuid(), idUser).isPresent();
 
         List<TagDTO> tagDTOS = postEntity.getTags() != null ?
                 postEntity.getTags().stream()
                         .map(tagEntity -> TagDTOMapper.toTagDto(tagEntity, idUser, likeRepository, complaintRepository))
                         .collect(Collectors.toList()) : new ArrayList<>();
 
+        // Filtra somente os comentários válidos
         List<CommentDTO> commentDTOS = postEntity.getComments() != null ?
                 postEntity.getComments().stream()
+                        .filter(CommentEntity::isValido) // Apenas comentários válidos
                         .map(commentEntity -> CommentDTOMapper.toCommentDto(commentEntity, idUser, likeRepository, complaintRepository))
                         .collect(Collectors.toList()) : new ArrayList<>();
 
@@ -42,5 +44,6 @@ public class PostDTOMapper {
                 commentDTOS
         );
     }
+
 }
 

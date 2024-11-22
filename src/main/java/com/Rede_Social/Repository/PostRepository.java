@@ -18,7 +18,11 @@ public interface PostRepository extends JpaRepository<PostEntity, UUID> {
     @Query(value = "SELECT p.* " + "FROM post p " + "JOIN like l ON p.id = l.post_id " + "WHERE l.data_like >= CURRENT_DATE - INTERVAL 7 DAY " + "GROUP BY p.id " + "ORDER BY COUNT(l.id) DESC LIMIT 1", nativeQuery = true)
     PostEntity findByMaisCurtido();
 
-    @Query(value = "SELECT p.* FROM post p " + "WHERE p.valido = true " + "ORDER BY p.data DESC " + "LIMIT 50", nativeQuery = true)
+    @Query(value = """
+    SELECT DISTINCT p.* 
+    FROM post p
+    LEFT JOIN comment c ON p.uuid = c.post_id
+    WHERE p.valido = true AND (c.valido = true OR c.valido IS NULL)
+    """, nativeQuery = true)
     List<PostEntity> PostsValidos();
-
 }
