@@ -7,7 +7,8 @@ public class UserDTOMapper {
     public static UserDTO toUserDto(UserEntity userEntity) {
         return new UserDTO(
                 userEntity.getUuid(),
-                userEntity.getEmail()
+                userEntity.getEmail(),
+                userEntity.getNome()
         );
     }
 }
