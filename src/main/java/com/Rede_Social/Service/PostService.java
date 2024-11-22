@@ -1,5 +1,10 @@
 package com.Rede_Social.Service;
 
+import com.Rede_Social.DTO.Consulta.PostDTO;
+import com.Rede_Social.DTO.Consulta.Top10PostsComLike.PostConsultaTop10DTO;
+import com.Rede_Social.DTO.Criacao.PostCriacaoDTO;
+import com.Rede_Social.DTO.Mapper.PostDTOMapper;
+import com.Rede_Social.DTO.Mapper.Top10PostsComLike.PostTop10Mapper;
 import com.Rede_Social.Entity.*;
 import com.Rede_Social.Exception.Post.PostNotFoundException;
 import com.Rede_Social.Exception.User.UserNotFoundException;
@@ -11,7 +16,10 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -37,23 +45,36 @@ public class PostService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public PostEntity save(PostEntity post) {
+//    }
+
+    public String save(PostCriacaoDTO post) {
         try {
-            UserEntity user = userRepository.findById(post.getUser().getUuid()).orElseThrow(UserNotFoundException::new);
+            UserEntity usuario = userRepository.findById(post.userId()).orElseThrow(UserNotFoundException::new);
 
-            List<UUID> tagsId = post.getTags().stream().map(TagEntity::getUuid).toList();
+            PostEntity postEntity = new PostEntity();
 
-            List<TagEntity> tags = tagRepository.findAllById(tagsId);
+            postEntity.setUser(usuario);
 
-            post.setUser(user);
+            postEntity.setConteudo(post.conteudo());
 
-            post.setTags(tags);
+            postEntity.setValido(geminiService.validadeAI(post.conteudo()));
 
-            post.setData(Instant.now());
+            postEntity.setData(Instant.now());
 
-            post.setValido(geminiService.validadeAI(post.getConteudo()));
+            List<TagEntity> tagEntities = post.tags().stream()
+                    .map(dto -> {
+                        return tagRepository.findByNome(dto.nome())
+                                .orElseGet(() -> new TagEntity(dto.nome()));
+                    })
+                    .toList();
 
-            return postRepository.save(post);
+            postEntity.setProfileAnimal(ThreadLocalRandom.current().nextInt(1, 21));
+
+            postEntity.setTags(tagEntities);
+
+            postRepository.save(postEntity);
+
+            return "Post Criado";
         } catch (UserNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -62,34 +83,21 @@ public class PostService {
         }
     }
 
-    public PostEntity update(PostEntity post, UUID uuid) {
-        try {
-            postRepository.findById(uuid).orElseThrow(() -> new RuntimeException("Post não existe no banco"));
-            post.setUuid(uuid);
-            return postRepository.save(post);
-        } catch (Exception e) {
-            System.out.println("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());
-            throw new RuntimeException("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());
-        }
+
+    public PostDTO findById(UUID uuid) {
+        PostEntity post = postRepository.findById(uuid).orElseThrow(PostNotFoundException::new);
+        return PostDTOMapper.toPostDto(post, null, likeRepository, complaintRepository);
     }
 
-    public String delete(UUID uuid) {
+    public List<PostDTO> findAll() {
         try {
-            postRepository.deleteById(uuid);
-            return "Post deletado";
-        } catch (Exception e) {
-            System.out.println("Erro no service, não deu para deletar o post no repository: " + e.getMessage());
-            throw new RuntimeException("Erro no service, não deu para deletar o post no repository: " + e.getMessage());
-        }
-    }
-
-    public PostEntity findById(UUID uuid) {
-        return postRepository.findById(uuid).orElseThrow(PostNotFoundException::new);
-    }
-
-    public List<PostEntity> findAll() {
-        try {
-            return postRepository.findAll();
+            List<PostEntity> posts = postRepository.findAll();
+            List<PostDTO> postDTOList = new ArrayList<>();
+            for (PostEntity post : posts) {
+                PostDTO postDto = PostDTOMapper.toPostDto(post, null, likeRepository, complaintRepository);
+                postDTOList.add(postDto);
+            }
+            return postDTOList;
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
@@ -101,14 +109,15 @@ public class PostService {
             PostEntity post = postRepository.findById(idPost).orElseThrow(PostNotFoundException::new);
             UserEntity user = userRepository.findById(idUser).orElseThrow(UserNotFoundException::new);
 
-            boolean likado = likeRepository.findByPostAndUser(idPost, idUser).isPresent();
+            Optional<LikeEntity> existingLike = likeRepository.findByPostAndUser(idPost, idUser);
 
-            if(!likado) {
-                LikeEntity like = new LikeEntity(UUID.randomUUID(), user, post, null);
-                likeRepository.save(like);
+            if (!existingLike.isPresent()) {
+                LikeEntity newLike = new LikeEntity(UUID.randomUUID(), user, post, null);
+                likeRepository.save(newLike);
                 return "Like no Post dado";
-            } else{
-                throw new RuntimeException("Usuário já deu like nesse Post");
+            } else {
+                likeRepository.deleteById(existingLike.get().getUuid());
+                return "Like no Post removido";
             }
         } catch (PostNotFoundException | UserNotFoundException e) {
            throw e;
@@ -122,14 +131,15 @@ public class PostService {
             CommentEntity comentario = commentRepository.findById(idComentario).orElseThrow(() -> new RuntimeException("Comentario não encontrado"));
             UserEntity user = userRepository.findById(idUser).orElseThrow(UserNotFoundException::new);
 
-            boolean likado = likeRepository.findByCommentAndUser(idComentario, idUser).isPresent();
+            Optional<LikeEntity> existingLike = likeRepository.findByCommentAndUser(idComentario, idUser);
 
-            if(!likado) {
+            if(!existingLike.isPresent()) {
                 LikeEntity like = new LikeEntity(UUID.randomUUID(), user, null, comentario);
                 likeRepository.save(like);
                 return "Like no comentario dado";
             }else{
-                throw new RuntimeException("Usuário já deu like nesse Comentário");
+                likeRepository.deleteById(existingLike.get().getUuid());
+                return "Like no Post removido";
             }
         } catch (UserNotFoundException e){
             throw e;
@@ -143,11 +153,16 @@ public class PostService {
             PostEntity post = postRepository.findById(idPost).orElseThrow(PostNotFoundException::new);
             UserEntity user = userRepository.findById(idUser).orElseThrow(UserNotFoundException::new);
 
-            ComplaintEntity denuncia = new ComplaintEntity(UUID.randomUUID(), user, post, null);
+            Optional<ComplaintEntity> existingComplaint = complaintRepository.findByPostAndUser(idPost, idUser);
 
-            complaintRepository.save(denuncia);
-
-            return "Denuncia ao post feita";
+            if (!existingComplaint.isPresent()) {
+                ComplaintEntity denuncia = new ComplaintEntity(UUID.randomUUID(), user, post, null);
+                complaintRepository.save(denuncia);
+                return "Denuncia ao post feita";
+            } else {
+                complaintRepository.deleteById(existingComplaint.get().getUuid());
+                return "Denuncia no Post removida";
+            }
         } catch (PostNotFoundException | UserNotFoundException e) {
             throw e;
         } catch (Exception e){
@@ -155,54 +170,150 @@ public class PostService {
         }
     }
 
-    public String denunciarComentario(UUID idComentario, UUID idUser){
+    public String denunciarComentario(UUID idComment, UUID idUser) {
         try {
-            CommentEntity comentario = commentRepository.findById(idComentario).orElseThrow(() -> new RuntimeException("Comentario não encontrado"));
-            UserEntity user = userRepository.findById(idUser).orElseThrow(UserNotFoundException::new);
+            CommentEntity comment = commentRepository.findById(idComment)
+                    .orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
+            UserEntity user = userRepository.findById(idUser)
+                    .orElseThrow(UserNotFoundException::new);
 
-            ComplaintEntity denuncia = new ComplaintEntity(UUID.randomUUID(), user, null, comentario);
+            Optional<ComplaintEntity> existingComplaint = complaintRepository.findByCommentAndUser(idComment, idUser);
 
-            complaintRepository.save(denuncia);
-
-            return "Denuncia ao comentario feita";
+            if (!existingComplaint.isPresent()) {
+                ComplaintEntity denuncia = new ComplaintEntity(UUID.randomUUID(), user, null, comment);
+                complaintRepository.save(denuncia);
+                return "Denúncia ao comentário feita";
+            } else {
+                complaintRepository.deleteById(existingComplaint.get().getUuid());
+                return "Denúncia ao comentário removida";
+            }
         } catch (UserNotFoundException e) {
             throw e;
-        } catch (Exception e){
-            throw new RuntimeException("Erro inesperado ao denunciar comentario", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro inesperado ao denunciar comentário", e);
         }
     }
 
-    public List<PostEntity> findByTagsNome(String tag){
+
+    public List<PostDTO> findByTagsNome(String tag){
         try {
-            return postRepository.findByTagsNome(tag);
+            List<PostEntity> posts = postRepository.findByTagsNome(tag);
+            List<PostDTO> postsDTO = new ArrayList<>();
+            for(PostEntity post : posts){
+                PostDTO postDto = PostDTOMapper.toPostDto(post, null, likeRepository, complaintRepository);
+                postsDTO.add(postDto);
+            }
+            return postsDTO;
         } catch (Exception e){
             throw e;
         }
     }
 
-    public List<PostEntity> Top10PostsComLike() {
+    public List<PostConsultaTop10DTO> Top10PostsComLike() {
         try {
-            return postRepository.Top10PostsComLike();
+            List<PostEntity> posts = postRepository.Top10PostsComLike();
+
+            return posts.stream()
+                    .map(PostTop10Mapper::toPostConsultaDTO)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
         }
     }
 
-    public PostEntity postMaisCurtidoDaSemana(){
+
+    public PostDTO postMaisCurtidoDaSemana(){
         try{
-            return postRepository.findByMaisCurtido();
+            PostEntity post = postRepository.findByMaisCurtido();
+            return PostDTOMapper.toPostDto(post, null, likeRepository, complaintRepository);
         }catch (Exception e){
             throw new RuntimeException("Erro ao buscar o post mais curtido da semana: " + e.getMessage());
         }
     }
 
-    public List<PostEntity> PostsValidos() {
+    public List<PostDTO> PostsValidos(UUID idUser) {
         try {
-            return postRepository.PostsValidos();
+            List<PostEntity> postsValidos = postRepository.PostsValidos();
+            List<PostDTO> postDTOList = new ArrayList<>();
+            boolean like, reported;
+
+            for (PostEntity post : postsValidos) {
+                like = likeRepository.findByPostAndUser(post.getUuid(), idUser).isPresent();
+                reported = complaintRepository.findByPostAndUser(post.getUuid(), idUser).isPresent();
+                PostDTO postDto = PostDTOMapper.toPostDto(post, idUser, likeRepository, complaintRepository);
+                if(like){
+                    postDto.setLiked(true);
+                }
+                if(reported){
+                    postDto.setReported(true);
+                }
+                postDTOList.add(postDto);
+            }
+            return postDTOList;
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
         }
     }
 }
+//    public String save(PostDTO post) {
+//        try {
+//            UserEntity user = userRepository.findById(post.getUserId()).orElseThrow(UserNotFoundException::new);
+//
+//            List<UUID> tagsId = post.getTagsId();
+//
+//            PostEntity postEntity = new PostEntity();
+//            postEntity.setConteudo(post.getConteudo());
+//            postEntity.setData(Instant.now());
+//            postEntity.setValido(geminiService.validadeAI(post.getConteudo()));
+//            postEntity.setUser(user);
+//
+//            if(tagsId != null && !tagsId.isEmpty()) {
+//                List<TagEntity> tags = tagRepository.findAllById(tagsId);
+//                postEntity.setTags(tags);
+//            }
+//
+//            postRepository.save(postEntity);
+//
+//            return "Post Criado";
+//        } catch (UserNotFoundException e) {
+//            throw e;
+//        } catch (Exception e) {
+//            System.out.println("Erro no service, não deu para salvar o post no repository: " + e.getMessage());
+//            throw new RuntimeException("Erro no service, não deu para salvar o post no repository: " + e.getMessage());
+//        }
+//
+//    public String update(PostCriacaoDTO post, UUID uuid) {
+//        try {
+//            PostEntity existingPost = postRepository.findById(uuid)
+//                    .orElseThrow(() -> new RuntimeException("Post não existe no banco"));
+//            existingPost.setConteudo(post.conteudo());
+//            existingPost.setValido(geminiService.validadeAI(post.conteudo()));
+//
+//            List<TagEntity> tagEntities = post.tags().stream()
+//                    .map(dto -> {
+//                        return tagRepository.findByNome(dto.nome())
+//                                .orElseGet(() -> new TagEntity(dto.nome()));
+//                    })
+//                    .toList();
+//            existingPost.setTags(tagEntities);
+//
+//            PostEntity updatedPost = postRepository.save(existingPost);
+//
+//            return "Post atualizado";
+//        } catch (Exception e) {
+//            System.out.println("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());
+//            throw new RuntimeException("Erro no service, não deu para atualizar o post no repository: " + e.getMessage());
+//        }
+//    }
+//
+//    public String delete(UUID uuid) {
+//        try {
+//            postRepository.deleteById(uuid);
+//            return "Post deletado";
+//        } catch (Exception e) {
+//            System.out.println("Erro no service, não deu para deletar o post no repository: " + e.getMessage());
+//            throw new RuntimeException("Erro no service, não deu para deletar o post no repository: " + e.getMessage());
+//        }
+//    }

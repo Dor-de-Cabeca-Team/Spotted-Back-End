@@ -2,9 +2,11 @@
 package com.Rede_Social.Auth;
 
 import com.Rede_Social.Config.JwtServiceGenerator;
+import com.Rede_Social.Entity.EmailEntity;
 import com.Rede_Social.Entity.Enum.Role;
 import com.Rede_Social.Entity.UserEntity;
 import com.Rede_Social.Repository.UserRepository;
+import com.Rede_Social.Service.Email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +29,8 @@ public class AuthService {
 	private AuthenticationManager authenticationManager;
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
+	@Autowired
+	private EmailService emailService;
 
     public String logar(Login login){
         authenticationManager.authenticate(
@@ -50,6 +54,9 @@ public class AuthService {
 			UserEntity novoUsuario = new UserEntity(Role.USUARIO, dado.nome(), dado.idade(), dado.email(), encryptedSenha, false);
 
 			userRepository.save(novoUsuario);
+
+			EmailEntity email = emailService.criarEmail(novoUsuario);
+			emailService.enviaEmail(email);
 
 		} catch (IllegalArgumentException e) {
 			throw e;

@@ -30,4 +30,8 @@ public class TagEntity {
     @ManyToMany
     @JsonIgnore
     private List<PostEntity> posts = new ArrayList<>();
+
+    public TagEntity(String nome) {
+        this.nome = nome;
+    }
 }
