@@ -35,9 +35,9 @@ public class PostController {
     }
 
     @GetMapping("/findById")
-    public ResponseEntity<PostDTO> findById(@RequestParam UUID uuid) {
+    public ResponseEntity<PostDTO> findById(@RequestParam UUID idPost, UUID idUser) {
         try {
-            return ResponseEntity.ok(postService.findById(uuid));
+            return ResponseEntity.ok(postService.findById(idPost, idUser));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

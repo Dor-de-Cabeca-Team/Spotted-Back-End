@@ -84,9 +84,9 @@ public class PostService {
     }
 
 
-    public PostDTO findById(UUID uuid) {
-        PostEntity post = postRepository.findById(uuid).orElseThrow(PostNotFoundException::new);
-        return PostDTOMapper.toPostDto(post, null, likeRepository, complaintRepository);
+    public PostDTO findById(UUID idPost, UUID idUser) {
+        PostEntity post = postRepository.findById(idPost).orElseThrow(PostNotFoundException::new);
+        return PostDTOMapper.toPostDto(post, idUser, likeRepository, complaintRepository);
     }
 
     public List<PostDTO> findAll() {
