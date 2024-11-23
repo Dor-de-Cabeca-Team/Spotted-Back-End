@@ -33,7 +33,7 @@ public class EmailService {
         emailEntity.setOwnerRef(user.getUuid());
         emailEntity.setEmailFrom(this.emailFrom);
         emailEntity.setEmailTo(user.getEmail());
-        emailEntity.setSubject("Bem-vindo(a) ao Rede Social! 🎉");
+        emailEntity.setSubject("Bem-vindo(a) ao Spotted! 🎉");
 
         String hash = generateHash(user.getNome(), user.getEmail());
 
