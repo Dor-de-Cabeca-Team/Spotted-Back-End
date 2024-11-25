@@ -1,5 +1,6 @@
 package com.Rede_Social.Auth;
 
+import com.Rede_Social.Auth.PasswordReset.ResetPasswordRequestDTO;
 import com.Rede_Social.DTO.Request.TrocarSenhaRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -67,10 +68,10 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> redefinirSenha(@RequestParam String token, @RequestParam String novaSenha) {
+    @PostMapping("/resetar-conta")
+    public ResponseEntity<?> redefinirSenha(@RequestBody ResetPasswordRequestDTO dados) {
         try {
-            authService.redefinirSenha(token, novaSenha);
+            authService.redefinirSenha(dados.token(), dados.novaSenha());
             return ResponseEntity.ok("Senha redefinida com sucesso.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -79,4 +80,5 @@ public class AuthController {
                     .body("Erro ao redefinir a senha.");
         }
     }
+
 }

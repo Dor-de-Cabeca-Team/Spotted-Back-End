@@ -98,7 +98,7 @@ public class EmailService {
         emailEntity.setEmailTo(user.getEmail());
         emailEntity.setSubject("Redefinição de Senha - Spotted");
 
-        String resetLink = "http://localhost:8080/reset-password?token=" + token; // Altere o URL para o frontend correto
+        String resetLink = "http://3.14.52.24:8080/reset-password?token=" + token; // Altere o URL para o frontend correto
 
         emailEntity.setText("Olá " + user.getNome() + ",\n\n" +
                 "Recebemos uma solicitação para redefinir sua senha. Caso você tenha feito essa solicitação, clique no link abaixo para redefinir sua senha:\n\n" +
