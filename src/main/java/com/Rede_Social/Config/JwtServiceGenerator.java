@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import com.Rede_Social.Entity.UserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +19,12 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Service
-public class JwtServiceGenerator {  
+public class JwtServiceGenerator {
 
-  public String generateToken(UserEntity userDetails) {
+    @Autowired
+    private JwtConfig jwtConfig;
+
+    public String generateToken(UserEntity userDetails) {
 
 	  //AQUI VOCÊ PODE COLOCAR O QUE MAIS VAI COMPOR O PAYLOAD DO TOKEN
       Map<String, Object> extraClaims = new HashMap<>();
@@ -36,7 +40,7 @@ public class JwtServiceGenerator {
               .signWith(getSigningKey(), JwtConfig.ALGORITMO_ASSINATURA)
               .compact();
   }
-  
+
   private Claims extractAllClaims(String token) {
       return Jwts
               .parserBuilder()
@@ -60,11 +64,12 @@ public class JwtServiceGenerator {
       return extractClaim(token, Claims::getExpiration);
   }
 
-  private Key getSigningKey() {
-      byte[] keyBytes = Decoders.BASE64.decode(JwtConfig.SECRET_KEY);
-      return Keys.hmacShaKeyFor(keyBytes);
-  }
-  
+    private Key getSigningKey() {
+        // Agora busca a chave secreta de jwtConfig
+        byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
 
   public String extractUsername(String token) {
       return extractClaim(token,Claims::getSubject);

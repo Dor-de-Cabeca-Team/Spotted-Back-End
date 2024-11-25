@@ -35,9 +35,9 @@ public class PostController {
     }
 
     @GetMapping("/findById")
-    public ResponseEntity<PostDTO> findById(@RequestParam UUID uuid) {
+    public ResponseEntity<PostDTO> findById(@RequestParam UUID idPost, UUID idUser) {
         try {
-            return ResponseEntity.ok(postService.findById(uuid));
+            return ResponseEntity.ok(postService.findById(idPost, idUser));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -108,16 +108,6 @@ public class PostController {
         try {
             return ResponseEntity.ok(postService.Top10PostsComLike());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-
-    @GetMapping("/maisCurtidoDaSemana")
-    public ResponseEntity<PostDTO> postMaisCurtidoDaSemana(){
-        try{
-            return ResponseEntity.ok(postService.postMaisCurtidoDaSemana());
-        } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
     }

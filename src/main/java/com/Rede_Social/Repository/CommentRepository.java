@@ -17,7 +17,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, UUID> {
     @Query(value = "SELECT c.* FROM comment c " +
             "WHERE c.valido = true " +
             "AND c.post_id = :postId " +
-            "ORDER BY c.data DESC " +
+            "ORDER BY c.data ASC " +
             "LIMIT 10", nativeQuery = true)
     List<CommentEntity> commentsValidos(@Param("postId") UUID post_id);
 

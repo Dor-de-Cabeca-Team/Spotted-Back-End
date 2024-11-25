@@ -84,9 +84,9 @@ public class PostService {
     }
 
 
-    public PostDTO findById(UUID uuid) {
-        PostEntity post = postRepository.findById(uuid).orElseThrow(PostNotFoundException::new);
-        return PostDTOMapper.toPostDto(post, null, likeRepository, complaintRepository);
+    public PostDTO findById(UUID idPost, UUID idUser) {
+        PostEntity post = postRepository.findById(idPost).orElseThrow(PostNotFoundException::new);
+        return PostDTOMapper.toPostDto(post, idUser, likeRepository, complaintRepository);
     }
 
     public List<PostDTO> findAll() {
@@ -112,7 +112,7 @@ public class PostService {
             Optional<LikeEntity> existingLike = likeRepository.findByPostAndUser(idPost, idUser);
 
             if (!existingLike.isPresent()) {
-                LikeEntity newLike = new LikeEntity(UUID.randomUUID(), user, post, null);
+                LikeEntity newLike = new LikeEntity(UUID.randomUUID(), Instant.now(), user, post, null);
                 likeRepository.save(newLike);
                 return "Like no Post dado";
             } else {
@@ -134,7 +134,7 @@ public class PostService {
             Optional<LikeEntity> existingLike = likeRepository.findByCommentAndUser(idComentario, idUser);
 
             if(!existingLike.isPresent()) {
-                LikeEntity like = new LikeEntity(UUID.randomUUID(), user, null, comentario);
+                LikeEntity like = new LikeEntity(UUID.randomUUID(), Instant.now(), user, null, comentario);
                 likeRepository.save(like);
                 return "Like no comentario dado";
             }else{
@@ -219,16 +219,6 @@ public class PostService {
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
-        }
-    }
-
-
-    public PostDTO postMaisCurtidoDaSemana(){
-        try{
-            PostEntity post = postRepository.findByMaisCurtido();
-            return PostDTOMapper.toPostDto(post, null, likeRepository, complaintRepository);
-        }catch (Exception e){
-            throw new RuntimeException("Erro ao buscar o post mais curtido da semana: " + e.getMessage());
         }
     }
 

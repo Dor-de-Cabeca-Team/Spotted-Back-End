@@ -1,6 +1,8 @@
 //AuthenticationService.java
 package com.Rede_Social.Auth;
 
+import com.Rede_Social.Auth.PasswordReset.PasswordResetToken;
+import com.Rede_Social.Auth.PasswordReset.PasswordResetTokenRepository;
 import com.Rede_Social.Config.JwtServiceGenerator;
 import com.Rede_Social.DTO.Request.TrocarSenhaRequestDTO;
 import com.Rede_Social.Entity.EmailEntity;
@@ -10,12 +12,15 @@ import com.Rede_Social.Exception.User.UserNotFoundException;
 import com.Rede_Social.Repository.UserRepository;
 import com.Rede_Social.Service.Email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.sasl.AuthenticationException;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -34,6 +39,8 @@ public class AuthService {
 	private BCryptPasswordEncoder passwordEncoder;
 	@Autowired
 	private EmailService emailService;
+	@Autowired
+	private PasswordResetTokenRepository passwordResetTokenRepository;
 
     public String logar(Login login){
         authenticationManager.authenticate(
@@ -44,8 +51,15 @@ public class AuthService {
         );
         UserEntity user = repository.findByEmail(login.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
-        return jwtService.generateToken(user);
-    }
+		if(user.getAtivo()) {
+			return jwtService.generateToken(user);
+		} else{
+			EmailEntity email = emailService.criarEmail(user);
+			emailService.enviaEmail(email);
+
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Email não verificado");
+		}
+	}
 
     public void registrar(Register dado) throws Exception {
 		try {
@@ -88,5 +102,38 @@ public class AuthService {
 			System.out.println("Erro no service, não foi possível atualizar o usuário: " + e.getMessage());
 			throw new RuntimeException("Erro no service, não foi possível atualizar o usuário: " + e.getMessage());
 		}
+	}
+
+	public void solicitarRedefinicaoSenha(String email) {
+		UserEntity user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new IllegalArgumentException("Usuário com o e-mail fornecido não encontrado."));
+
+
+		String token = UUID.randomUUID().toString();
+		PasswordResetToken resetToken = new PasswordResetToken(
+				token,
+				user,
+				LocalDateTime.now().plusMinutes(30) // Token válido por 30 minutos
+		);
+
+		passwordResetTokenRepository.save(resetToken);
+
+		EmailEntity emailEntity = emailService.criarEmailRedefinicaoSenha(user, token);
+		emailService.enviaEmail(emailEntity);
+	}
+
+	public void redefinirSenha(String token, String novaSenha) {
+		PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+				.orElseThrow(() -> new IllegalArgumentException("Token inválido ou expirado."));
+
+		if (resetToken.getExpirationDate().isBefore(LocalDateTime.now())) {
+			throw new IllegalArgumentException("Token expirado.");
+		}
+
+		UserEntity user = resetToken.getUser();
+		user.setSenha(passwordEncoder.encode(novaSenha));
+		userRepository.save(user);
+
+		passwordResetTokenRepository.delete(resetToken);
 	}
 }
