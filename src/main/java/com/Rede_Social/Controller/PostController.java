@@ -112,16 +112,6 @@ public class PostController {
         }
     }
 
-
-    @GetMapping("/maisCurtidoDaSemana")
-    public ResponseEntity<PostDTO> postMaisCurtidoDaSemana(){
-        try{
-            return ResponseEntity.ok(postService.postMaisCurtidoDaSemana());
-        } catch (Exception e){
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
     @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/postsValidos")
     public ResponseEntity<List<PostDTO>> PostsValidos(@RequestParam UUID idUser) {
