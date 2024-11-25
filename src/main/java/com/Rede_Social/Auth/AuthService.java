@@ -10,10 +10,12 @@ import com.Rede_Social.Exception.User.UserNotFoundException;
 import com.Rede_Social.Repository.UserRepository;
 import com.Rede_Social.Service.Email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.sasl.AuthenticationException;
 import java.util.UUID;
@@ -44,8 +46,15 @@ public class AuthService {
         );
         UserEntity user = repository.findByEmail(login.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
-        return jwtService.generateToken(user);
-    }
+		if(user.getAtivo()) {
+			return jwtService.generateToken(user);
+		} else{
+			EmailEntity email = emailService.criarEmail(user);
+			emailService.enviaEmail(email);
+
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Email não verificado");
+		}
+	}
 
     public void registrar(Register dado) throws Exception {
 		try {
