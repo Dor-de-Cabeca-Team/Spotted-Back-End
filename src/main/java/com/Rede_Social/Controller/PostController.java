@@ -36,6 +36,7 @@ public class PostController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/findById")
     public ResponseEntity<PostDTO> findById(@RequestParam UUID idPost, UUID idUser) {
         try {
@@ -95,6 +96,7 @@ public class PostController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/findTags")
     public ResponseEntity<List<PostDTO>> findPostByTag(@RequestParam String tag){
         try {

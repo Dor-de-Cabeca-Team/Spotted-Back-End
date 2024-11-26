@@ -4,6 +4,7 @@ import com.Rede_Social.Entity.ComplaintEntity;
 import com.Rede_Social.Service.ComplaintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class ComplaintController {
     @Autowired
     private ComplaintService complaintService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/save")
     public ResponseEntity<ComplaintEntity> save(@RequestBody ComplaintEntity complaint) {
         try {
@@ -26,6 +28,7 @@ public class ComplaintController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<ComplaintEntity> update(@RequestBody ComplaintEntity complaint, @RequestParam UUID uuid) {
         try {
@@ -35,6 +38,7 @@ public class ComplaintController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(@RequestParam UUID uuid) {
         try {
@@ -44,6 +48,7 @@ public class ComplaintController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findById")
     public ResponseEntity<ComplaintEntity> findById(@RequestParam UUID uuid) {
         try {
@@ -53,6 +58,7 @@ public class ComplaintController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findAll")
     public ResponseEntity<List<ComplaintEntity>> findAll() {
         try {

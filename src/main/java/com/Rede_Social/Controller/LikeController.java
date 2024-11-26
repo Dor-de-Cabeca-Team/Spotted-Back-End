@@ -4,6 +4,7 @@ import com.Rede_Social.Entity.LikeEntity;
 import com.Rede_Social.Service.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class LikeController {
     @Autowired
     private LikeService likeService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/save")
     public ResponseEntity<LikeEntity> save(@RequestBody LikeEntity like) {
         try {
@@ -26,6 +28,7 @@ public class LikeController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<LikeEntity> update(@RequestBody LikeEntity like, @RequestParam UUID uuid) {
         try {
@@ -35,6 +38,7 @@ public class LikeController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(@RequestParam UUID uuid) {
         try {
@@ -44,6 +48,7 @@ public class LikeController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findById")
     public ResponseEntity<LikeEntity> findById(@RequestParam UUID uuid) {
         try {
@@ -53,6 +58,7 @@ public class LikeController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findAll")
     public ResponseEntity<List<LikeEntity>> findAll() {
         try {

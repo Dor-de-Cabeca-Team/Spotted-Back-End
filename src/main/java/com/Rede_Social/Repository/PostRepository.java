@@ -28,14 +28,14 @@ public interface PostRepository extends JpaRepository<PostEntity, UUID> {
     SELECT DISTINCT p.* 
     FROM post p
     LEFT JOIN comment c ON p.uuid = c.post_id
-    WHERE p.valido = true AND (c.valido = true OR c.valido IS NULL)
+    WHERE p.valido = true
     ORDER BY p.data DESC
     """,
             countQuery = """
     SELECT COUNT(DISTINCT p.uuid)
     FROM post p
     LEFT JOIN comment c ON p.uuid = c.post_id
-    WHERE p.valido = true AND (c.valido = true OR c.valido IS NULL)
+    WHERE p.valido = true
     """,
             nativeQuery = true)
     Page<PostEntity> PostsValidos(Pageable pageable);

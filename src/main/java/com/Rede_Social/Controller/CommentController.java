@@ -20,6 +20,7 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody CommentCriacaoDTO comment) {
         try {
@@ -29,6 +30,7 @@ public class CommentController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/findById")
     public ResponseEntity<CommentDTO> findById(@RequestParam UUID uuid) {
         try {
@@ -38,6 +40,7 @@ public class CommentController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findAll")
     public ResponseEntity<List<CommentDTO>> findAll() {
         try {
