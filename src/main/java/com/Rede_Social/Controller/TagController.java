@@ -6,6 +6,7 @@ import com.Rede_Social.Service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class TagController {
     @Autowired
     private TagService tagService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody TagDTO tag) {
         try {
@@ -28,6 +30,7 @@ public class TagController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findById")
     public ResponseEntity<TagDTO> findById(@RequestParam UUID uuid) {
         try {
@@ -37,6 +40,7 @@ public class TagController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findAll")
     public ResponseEntity<List<TagDTO>> findAll() {
         try {

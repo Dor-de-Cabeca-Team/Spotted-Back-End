@@ -20,6 +20,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody UserCriacaoDTO user) {
         try {
@@ -29,6 +30,7 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<String> update(@RequestBody UserCriacaoDTO user, @RequestParam UUID uuid) {
         try {
@@ -38,6 +40,7 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(@RequestParam UUID uuid) {
         try {
@@ -57,6 +60,7 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findAll")
     public ResponseEntity<List<UserDTO>> findAll() {
         try {
@@ -76,6 +80,7 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/login-provisorio")
     public ResponseEntity<String> loginProvisorio(@RequestParam String email, @RequestParam String senha) {
         try {
