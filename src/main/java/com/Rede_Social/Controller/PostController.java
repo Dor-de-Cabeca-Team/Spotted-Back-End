@@ -6,6 +6,8 @@ import com.Rede_Social.DTO.Criacao.PostCriacaoDTO;
 import com.Rede_Social.Service.CommentService;
 import com.Rede_Social.Service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -114,13 +116,14 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USUARIO')")
     @GetMapping("/postsValidos")
-    public ResponseEntity<List<PostDTO>> PostsValidos(@RequestParam UUID idUser) {
+    public ResponseEntity<Page<PostDTO>> PostsValidos(@RequestParam UUID idUser, Pageable pageable) {
         try {
-            return ResponseEntity.ok(postService.PostsValidos(idUser));
+            return ResponseEntity.ok(postService.PostsValidos(idUser, pageable));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
+
 }
 
 //    @PutMapping("/update")

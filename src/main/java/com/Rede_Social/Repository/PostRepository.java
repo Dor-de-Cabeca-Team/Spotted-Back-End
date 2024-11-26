@@ -1,6 +1,8 @@
 package com.Rede_Social.Repository;
 
 import com.Rede_Social.Entity.PostEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -28,7 +30,13 @@ public interface PostRepository extends JpaRepository<PostEntity, UUID> {
     LEFT JOIN comment c ON p.uuid = c.post_id
     WHERE p.valido = true AND (c.valido = true OR c.valido IS NULL)
     ORDER BY p.data DESC
-    LIMIT 50
-    """, nativeQuery = true)
-    List<PostEntity> PostsValidos();
+    """,
+            countQuery = """
+    SELECT COUNT(DISTINCT p.uuid)
+    FROM post p
+    LEFT JOIN comment c ON p.uuid = c.post_id
+    WHERE p.valido = true AND (c.valido = true OR c.valido IS NULL)
+    """,
+            nativeQuery = true)
+    Page<PostEntity> PostsValidos(Pageable pageable);
 }

@@ -11,6 +11,8 @@ import com.Rede_Social.Exception.User.UserNotFoundException;
 import com.Rede_Social.Repository.*;
 import com.Rede_Social.Service.AI.GeminiService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -222,24 +224,21 @@ public class PostService {
         }
     }
 
-    public List<PostDTO> PostsValidos(UUID idUser) {
+    public Page<PostDTO> PostsValidos(UUID idUser, Pageable pageable) {
         try {
-            List<PostEntity> postsValidos = postRepository.PostsValidos();
+            Page<PostEntity> postsValidos = postRepository.PostsValidos(pageable);
 
-            return postsValidos.stream()
-                    .map(post -> {
-                        PostDTO postDto = PostDTOMapper.toPostDto(post, idUser, likeRepository, complaintRepository);
-                        postDto.setLiked(likeRepository.findByPostAndUser(post.getUuid(), idUser).isPresent());
-                        postDto.setReported(complaintRepository.findByPostAndUser(post.getUuid(), idUser).isPresent());
-                        return postDto;
-                    })
-                    .collect(Collectors.toList());
+            return postsValidos.map(post -> {
+                PostDTO postDto = PostDTOMapper.toPostDto(post, idUser, likeRepository, complaintRepository);
+                postDto.setLiked(likeRepository.findByPostAndUser(post.getUuid(), idUser).isPresent());
+                postDto.setReported(complaintRepository.findByPostAndUser(post.getUuid(), idUser).isPresent());
+                return postDto;
+            });
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para listar os posts do banco: " + e.getMessage());
             throw new RuntimeException("Erro no service, não deu para listar os posts: " + e.getMessage());
         }
     }
-
 }
 //    public String save(PostDTO post) {
 //        try {
