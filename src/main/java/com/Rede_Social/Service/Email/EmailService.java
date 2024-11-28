@@ -37,7 +37,7 @@ public class EmailService {
 
         String hash = generateHash(user.getNome(), user.getEmail());
 
-        String validationLink = "http://3.14.52.24:8080/api/user/validar-conta?idUser=" + user.getUuid() + "&hash=" + hash;
+        String validationLink = "http://spoteddua.com/email-validador?idUser=" + user.getUuid() + "&hash=" + hash;
 
         emailEntity.setText("Olá " + user.getNome() + ",\n\n" +
                 "Estamos muito felizes em tê-lo(a) como parte da nossa comunidade! Para completar o seu cadastro e ativar a sua conta, por favor clique no link abaixo:\n\n" +
@@ -98,7 +98,7 @@ public class EmailService {
         emailEntity.setEmailTo(user.getEmail());
         emailEntity.setSubject("Redefinição de Senha - Spotted");
 
-        String resetLink = "http://3.14.52.24/reset-password?token=" + token; // Altere o URL para o frontend correto
+        String resetLink = "http://spoteddua.com/reset-password?token=" + token; // Altere o URL para o frontend correto
 
         emailEntity.setText("Olá " + user.getNome() + ",\n\n" +
                 "Recebemos uma solicitação para redefinir sua senha. Caso você tenha feito essa solicitação, clique no link abaixo para redefinir sua senha:\n\n" +
