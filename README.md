@@ -1,6 +1,12 @@
-# Rede Social Back-End
+# Spotted Back-End
 
 Este é o repositório do back-end de uma aplicação de rede social desenvolvida em Java com Spring Boot.
+
+## Front-End do Projeto
+
+O repositório do front-end do projeto pode ser encontrado em:
+
+[Spotted-Front-End](https://github.com/Dor-de-Cabeca-Team/Spotted-Front-End)
 
 ## Clonando o Repositório
 
