@@ -37,7 +37,7 @@ public class GeminiService {
 
             System.out.println("Resultado extraído: " + result);
 
-            return "1".equals(result);
+            return "1".equals(result.trim());
         } else {
             throw new RuntimeException("Failed to call API: " + response.getStatusCode());
         }
