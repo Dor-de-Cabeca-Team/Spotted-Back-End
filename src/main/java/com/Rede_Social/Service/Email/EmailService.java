@@ -28,6 +28,9 @@ public class EmailService {
     @Value("${EmailFrom}")
     private String emailFrom;
 
+    @Value("${EmailURL}")
+    private String emailURL;
+
     public EmailEntity criarEmail(UserEntity user) {
         EmailEntity emailEntity = new EmailEntity();
         emailEntity.setOwnerRef(user.getUuid());
@@ -37,7 +40,7 @@ public class EmailService {
 
         String hash = generateHash(user.getNome(), user.getEmail());
 
-        String validationLink = "http://54.232.114.161/email-validador?idUser=" + user.getUuid() + "&hash=" + hash;
+        String validationLink = "http://"+emailURL+"/email-validador?idUser=" + user.getUuid() + "&hash=" + hash;
 
         emailEntity.setText("Olá " + user.getNome() + ",\n\n" +
                 "Estamos muito felizes em tê-lo(a) como parte da nossa comunidade! Para completar o seu cadastro e ativar a sua conta, por favor clique no link abaixo:\n\n" +
@@ -98,7 +101,7 @@ public class EmailService {
         emailEntity.setEmailTo(user.getEmail());
         emailEntity.setSubject("Redefinição de Senha - Spotted");
 
-        String resetLink = "http://54.232.114.161/reset-password?token=" + token; // Altere o URL para o frontend correto
+        String resetLink = "http://"+emailURL+"/reset-password?token=" + token; // Altere o URL para o frontend correto
 
         emailEntity.setText("Olá " + user.getNome() + ",\n\n" +
                 "Recebemos uma solicitação para redefinir sua senha. Caso você tenha feito essa solicitação, clique no link abaixo para redefinir sua senha:\n\n" +
