@@ -14,29 +14,31 @@ import java.util.UUID;
 public interface PostRepository extends JpaRepository<PostEntity, UUID> {
     List<PostEntity> findByTagsNome(String nome);
 
-    @Query(value = "SELECT p.* FROM post p " +
-            "LEFT JOIN likee l ON p.uuid = l.post_id " +
-            "WHERE p.valido = true " +
-            "AND l.data >= CURRENT_DATE - INTERVAL '7 days' " +
-            "GROUP BY p.uuid " +
-            "ORDER BY COUNT(l.uuid) DESC " +
-            "LIMIT 10",
-            nativeQuery = true)
+    @Query(value = """
+            SELECT p.* FROM post p
+            LEFT JOIN likee l ON p.uuid = l.post_id
+            WHERE p.valido = true
+            AND l.data >= (CURRENT_DATE - INTERVAL 7 DAY)
+            GROUP BY p.uuid, p.conteudo, p.data, p.profile_animal, p.user_id, p.valido
+            ORDER BY COUNT(l.uuid) DESC
+            LIMIT 10
+            """, nativeQuery = true)
     List<PostEntity> Top10PostsComLike();
 
+
     @Query(value = """
-    SELECT DISTINCT p.* 
-    FROM post p
-    LEFT JOIN comment c ON p.uuid = c.post_id
-    WHERE p.valido = true
-    ORDER BY p.data DESC
-    """,
+            SELECT DISTINCT p.* 
+            FROM post p
+            LEFT JOIN comment c ON p.uuid = c.post_id
+            WHERE p.valido = true
+            ORDER BY p.data DESC
+            """,
             countQuery = """
-    SELECT COUNT(DISTINCT p.uuid)
-    FROM post p
-    LEFT JOIN comment c ON p.uuid = c.post_id
-    WHERE p.valido = true
-    """,
+                    SELECT COUNT(DISTINCT p.uuid)
+                    FROM post p
+                    LEFT JOIN comment c ON p.uuid = c.post_id
+                    WHERE p.valido = true
+                    """,
             nativeQuery = true)
     Page<PostEntity> PostsValidos(Pageable pageable);
 }
