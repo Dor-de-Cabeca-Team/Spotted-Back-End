@@ -33,12 +33,15 @@ public class UserEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
+    @Column(unique = true, nullable = false)
+    private String keycloakId; // Armazena o ID do Keycloak (sub)
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column
     @NotNull
-    @Size(min = 2, max = 100, message = "O nome n pode ter menos que 2 caracteres e mais que 100")
+    @Size(min = 2, max = 100, message = "O nome não pode ter menos que 2 caracteres e mais que 100")
     private String nome;
 
     @Column
@@ -53,18 +56,14 @@ public class UserEntity implements UserDetails {
     private String email;
 
     @Column
-    @NotNull
-    @NotEmpty
-    private String senha;
-
-    Boolean ativo = false;
+    private Boolean ativo = false;
 
     @OneToMany(mappedBy = "user")
-    @JsonIgnoreProperties({"user", "complaints"})  // Evita loop infinito durante a serialização de ComplaintEntity
+    @JsonIgnoreProperties({"user", "complaints"})
     private List<ComplaintEntity> complaints = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    @JsonIgnoreProperties({"user", "likes"})  // Evita loop infinito durante a serialização de LikeEntity
+    @JsonIgnoreProperties({"user", "likes"})
     private List<LikeEntity> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
@@ -84,7 +83,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public String getPassword() {
-        return senha;
+        return null; // Senha não é armazenada localmente
     }
 
     @Override
@@ -92,12 +91,12 @@ public class UserEntity implements UserDetails {
         return email;
     }
 
-    public UserEntity(Role role, String nome, int idade, String email, String senha, Boolean ativo) {
+    public UserEntity(String keycloakId, Role role, String nome, int idade, String email, Boolean ativo) {
+        this.keycloakId = keycloakId;
         this.role = role;
         this.nome = nome;
         this.idade = idade;
         this.email = email;
-        this.senha = senha;
         this.ativo = ativo;
     }
 }

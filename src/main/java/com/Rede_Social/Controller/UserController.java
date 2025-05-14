@@ -20,15 +20,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody UserCriacaoDTO user) {
-        try {
-            return ResponseEntity.ok(userService.save(user));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update")
@@ -80,13 +72,5 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/login-provisorio")
-    public ResponseEntity<String> loginProvisorio(@RequestParam String email, @RequestParam String senha) {
-        try {
-            return ResponseEntity.ok(userService.loginProvisorio(email,senha));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-    }
+
 }

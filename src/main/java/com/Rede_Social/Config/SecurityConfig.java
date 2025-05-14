@@ -27,20 +27,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/post/**").authenticated() // Garante que todos os endpoints de /api/post exigem autenticação
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests
+                                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll() // Permitir acesso anônimo a /register e /login
+                                .anyRequest().authenticated() // Proteger todos os outros endpoints
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
                                 .jwkSetUri("http://localhost:8080/realms/spotted/protocol/openid-connect/certs")
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
-                );
+                )
+                .csrf().disable(); // Desativar CSRF para APIs REST (ajuste conforme necessário)
 
         return http.build();
     }

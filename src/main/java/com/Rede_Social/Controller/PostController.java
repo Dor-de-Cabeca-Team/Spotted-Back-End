@@ -46,7 +46,7 @@ public class PostController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USUARIO')")
     @GetMapping("/findAll")
     public ResponseEntity<List<PostDTO>> findAll() {
         try {
