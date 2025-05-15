@@ -27,58 +27,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors() // Habilita o CORS
+                .and()
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll() // Permitir acesso anônimo a /register e /login
-                                .anyRequest().authenticated() // Proteger todos os outros endpoints
+                                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                                .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
                                 .jwkSetUri("http://localhost:8080/realms/spotted/protocol/openid-connect/certs")
                         )
                 )
-                .csrf().disable(); // Desativar CSRF para APIs REST (ajuste conforme necessário)
+                .csrf().disable(); // Desativa CSRF para APIs REST
 
         return http.build();
     }
 
     @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            // Extrai os papéis do campo realm_access.roles
-            Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
-            List<String> roles = realmAccess != null ? (List<String>) realmAccess.get("roles") : Collections.emptyList();
-            return roles.stream()
-                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                    .collect(Collectors.toList());
-        });
-        return converter;
+    public CorsConfiguration corsConfiguration() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200")); // Permite apenas o frontend
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        config.setMaxAge(3600L);
+        return config;
     }
 
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(Arrays.asList("*"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
-        config.setAllowedMethods(Arrays.asList(HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(), HttpMethod.DELETE.name()));
-        config.setMaxAge(3600L);
-        source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/**", corsConfiguration());
         return new CorsFilter(source);
-    }
-
-    @Bean
-    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(Arrays.asList("*"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
-        config.setAllowedMethods(Arrays.asList(HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(), HttpMethod.DELETE.name()));
-        config.setMaxAge(3600L);
-        source.registerCorsConfiguration("/**", config);
-        return source;
     }
 }
