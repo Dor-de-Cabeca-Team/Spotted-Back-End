@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -71,11 +72,12 @@ public class AuthService {
 					}
 
 					String keycloakId = (String) claims.get("sub");
+					UUID uuid = UUID.fromString(keycloakId);
 					String email = (String) claims.get("email");
 					String username = (String) claims.get("preferred_username");
 
-					userRepository.findByKeycloakId(keycloakId).orElseGet(() -> {
-						UserEntity user = new UserEntity(keycloakId, Role.USUARIO, username, 18, email, false);
+					userRepository.findById(uuid).orElseGet(() -> {
+						UserEntity user = new UserEntity(uuid, Role.USUARIO, username, 18, email, false);
 						return userRepository.save(user);
 					});
 
@@ -129,16 +131,18 @@ public class AuthService {
 				throw new RuntimeException("Usuário não encontrado após criação.");
 			}
 
+
 			String keycloakId = (String) users.get(0).get("id");
+			UUID uuid = UUID.fromString((keycloakId));
 
 			// Salvar usuário no banco local
 			UserEntity userEntity = new UserEntity(
-					keycloakId,
+					uuid,
 					Role.USUARIO,
 					register.nome(),
 					register.idade(),
 					register.email(),
-					false
+					true
 			);
 			userRepository.save(userEntity);
 

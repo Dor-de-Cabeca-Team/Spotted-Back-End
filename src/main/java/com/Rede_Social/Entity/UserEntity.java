@@ -30,11 +30,11 @@ public class UserEntity implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(unique = true, nullable = false)
     private UUID uuid;
 
-    @Column(unique = true, nullable = false)
-    private String keycloakId; // Armazena o ID do Keycloak (sub)
+
+    //private UUID keycloakId; // Armazena o ID do Keycloak (sub)
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -91,8 +91,8 @@ public class UserEntity implements UserDetails {
         return email;
     }
 
-    public UserEntity(String keycloakId, Role role, String nome, int idade, String email, Boolean ativo) {
-        this.keycloakId = keycloakId;
+    public UserEntity(UUID uuid, Role role, String nome, int idade, String email, Boolean ativo) {
+        this.uuid = uuid;
         this.role = role;
         this.nome = nome;
         this.idade = idade;

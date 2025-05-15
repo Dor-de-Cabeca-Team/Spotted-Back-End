@@ -59,7 +59,9 @@ public class PostService {
 
             postEntity.setConteudo(post.conteudo());
 
-            postEntity.setValido(geminiService.validadeAI(post.conteudo()));
+            //postEntity.setValido(geminiService.validadeAI(post.conteudo()));
+            postEntity.setValido(true);
+
 
             postEntity.setData(Instant.now());
 
