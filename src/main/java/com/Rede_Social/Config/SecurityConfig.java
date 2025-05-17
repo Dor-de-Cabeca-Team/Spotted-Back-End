@@ -1,5 +1,6 @@
 package com.Rede_Social.Config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +25,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Value("${keycloak.auth-server-url}")
+    private String keycloakIp;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -36,7 +40,7 @@ public class SecurityConfig {
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
-                                .jwkSetUri("http://localhost:8080/realms/spotted/protocol/openid-connect/certs")
+                                .jwkSetUri(keycloakIp + "/realms/spotted/protocol/openid-connect/certs")
                         )
                 )
                 .csrf().disable(); // Desativa CSRF para APIs REST
@@ -48,7 +52,7 @@ public class SecurityConfig {
     public CorsConfiguration corsConfiguration() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200")); // Permite apenas o frontend
+        config.setAllowedOriginPatterns(Arrays.asList("https://10.35.232.57:443, https://192.168.0.20:443")); // Permite apenas o frontend
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         config.setMaxAge(3600L);
