@@ -1,5 +1,6 @@
 package com.Rede_Social.Service;
 
+import com.Rede_Social.Audit.AuditService;
 import com.Rede_Social.DTO.Consulta.PostDTO;
 import com.Rede_Social.DTO.Consulta.Top10PostsComLike.PostConsultaTop10DTO;
 import com.Rede_Social.DTO.Criacao.PostCriacaoDTO;
@@ -47,6 +48,9 @@ public class PostService {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Autowired
+    private AuditService auditService;
+
 //    }
 
     public String save(PostCriacaoDTO post) {
@@ -77,6 +81,8 @@ public class PostService {
             postEntity.setTags(tagEntities);
 
             postRepository.save(postEntity);
+
+            auditService.logAcao("Post criado: " + postEntity.getConteudo(), usuario.getEmail());
 
             return "Post Criado";
         } catch (UserNotFoundException e) {
@@ -118,9 +124,13 @@ public class PostService {
             if (!existingLike.isPresent()) {
                 LikeEntity newLike = new LikeEntity(UUID.randomUUID(), Instant.now(), user, post, null);
                 likeRepository.save(newLike);
+
+                auditService.logAcao("Like criado\nPost: " + post.getConteudo(), user.getEmail());
                 return "Like no Post dado";
             } else {
                 likeRepository.deleteById(existingLike.get().getUuid());
+
+                auditService.logAcao("Like deletado\nPost: " + post.getConteudo(), user.getEmail());
                 return "Like no Post removido";
             }
         } catch (PostNotFoundException | UserNotFoundException e) {
@@ -140,6 +150,8 @@ public class PostService {
             if(!existingLike.isPresent()) {
                 LikeEntity like = new LikeEntity(UUID.randomUUID(), Instant.now(), user, null, comentario);
                 likeRepository.save(like);
+
+                auditService.logAcao("Like criado\nComentario: " + comentario.getConteudo(), user.getEmail());
                 return "Like no comentario dado";
             }else{
                 likeRepository.deleteById(existingLike.get().getUuid());
@@ -162,9 +174,13 @@ public class PostService {
             if (!existingComplaint.isPresent()) {
                 ComplaintEntity denuncia = new ComplaintEntity(UUID.randomUUID(), user, post, null);
                 complaintRepository.save(denuncia);
+
+                auditService.logAcao("Denuncia criada\nPost: " + post.getConteudo(), user.getEmail());
                 return "Denuncia ao post feita";
             } else {
                 complaintRepository.deleteById(existingComplaint.get().getUuid());
+
+                auditService.logAcao("Denuncia deletada\nPost: " + post.getConteudo(), user.getEmail());
                 return "Denuncia no Post removida";
             }
         } catch (PostNotFoundException | UserNotFoundException e) {
@@ -186,9 +202,13 @@ public class PostService {
             if (!existingComplaint.isPresent()) {
                 ComplaintEntity denuncia = new ComplaintEntity(UUID.randomUUID(), user, null, comment);
                 complaintRepository.save(denuncia);
+
+                auditService.logAcao("Denuncia criada\nComentario: " + comment.getConteudo(), user.getEmail());
                 return "Denúncia ao comentário feita";
             } else {
                 complaintRepository.deleteById(existingComplaint.get().getUuid());
+
+                auditService.logAcao("Denuncia deletada\nComentario: " + comment.getConteudo(), user.getEmail());
                 return "Denúncia ao comentário removida";
             }
         } catch (UserNotFoundException e) {

@@ -1,8 +1,10 @@
 package com.Rede_Social.Auth;
 
+import com.Rede_Social.Audit.AuditService;
 import com.Rede_Social.Entity.UserEntity;
 import com.Rede_Social.Entity.Enum.Role;
 import com.Rede_Social.Repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,9 @@ public class AuthService {
 
 	private final WebClient webClient;
 	private final UserRepository userRepository;
+
+	@Autowired
+	AuditService auditService;
 
 	@Value("${keycloak.auth-server-url}")
 	private String keycloakServerUrl;
@@ -81,6 +86,7 @@ public class AuthService {
 						return userRepository.save(user);
 					});
 
+					auditService.logAcao("Usuario logado", email);
 					return accessToken;
 				})
 				.block();
@@ -144,6 +150,9 @@ public class AuthService {
 					register.email(),
 					true
 			);
+
+			auditService.logAcao("Usuario criado", register.email());
+
 			userRepository.save(userEntity);
 
 			// Associar o papel USUARIO no Keycloak

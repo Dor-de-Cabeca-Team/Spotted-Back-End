@@ -1,5 +1,6 @@
 package com.Rede_Social.Service;
 
+import com.Rede_Social.Audit.AuditService;
 import com.Rede_Social.DTO.Consulta.CommentDTO;
 import com.Rede_Social.DTO.Consulta.PostDTO;
 import com.Rede_Social.DTO.Criacao.CommentCriacaoDTO;
@@ -43,6 +44,9 @@ public class CommentService {
     @Autowired
     private ComplaintRepository complaintRepository;
 
+    @Autowired
+    private AuditService auditService;
+
     public String save(CommentCriacaoDTO comment) {
         try {
             UserEntity user = userRepository.findById(comment.user()).orElseThrow(UserNotFoundException::new);
@@ -57,6 +61,7 @@ public class CommentService {
 
             commentEntity.setProfileAnimal(ThreadLocalRandom.current().nextInt(1, 21));
 
+            auditService.logAcao(("Comentario: " + commentEntity.getConteudo() + "\npost: " + post.getConteudo()), user.getEmail());
 
             commentRepository.save(commentEntity);
 
