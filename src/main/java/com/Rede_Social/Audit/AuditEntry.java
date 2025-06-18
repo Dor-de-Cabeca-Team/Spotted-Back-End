@@ -1,9 +1,6 @@
 package com.Rede_Social.Audit;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,11 +11,12 @@ import lombok.Setter;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity(name = "audit")
+@Table(name = "audit")
 public class AuditEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -30,6 +28,7 @@ public class AuditEntry {
     @NotEmpty
     private String email;
 
-    @NotEmpty
     private String acao;
+
+    private String conteudo;
 }

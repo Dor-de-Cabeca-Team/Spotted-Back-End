@@ -1,5 +1,6 @@
 package com.Rede_Social.Service;
 
+import com.Rede_Social.Audit.AuditAcao;
 import com.Rede_Social.Audit.AuditService;
 import com.Rede_Social.DTO.Consulta.CommentDTO;
 import com.Rede_Social.DTO.Consulta.PostDTO;
@@ -61,7 +62,7 @@ public class CommentService {
 
             commentEntity.setProfileAnimal(ThreadLocalRandom.current().nextInt(1, 21));
 
-            auditService.logAcao(("Comentario: " + commentEntity.getConteudo() + "\npost: " + post.getConteudo()), user.getEmail());
+            auditService.logAcao(user.getEmail(), AuditAcao.COMENTARIO.getAuditAcao(), ("Comentario: " + commentEntity.getConteudo() + "\npost: " + post.getConteudo()));
 
             commentRepository.save(commentEntity);
 

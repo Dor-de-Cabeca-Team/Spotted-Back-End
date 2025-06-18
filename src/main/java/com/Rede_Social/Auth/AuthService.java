@@ -1,5 +1,6 @@
 package com.Rede_Social.Auth;
 
+import com.Rede_Social.Audit.AuditAcao;
 import com.Rede_Social.Audit.AuditService;
 import com.Rede_Social.Entity.UserEntity;
 import com.Rede_Social.Entity.Enum.Role;
@@ -86,7 +87,7 @@ public class AuthService {
 						return userRepository.save(user);
 					});
 
-					auditService.logAcao("Usuario logado", email);
+					auditService.logAcao(email, AuditAcao.LOGIN.getAuditAcao(), "Usuario logado");
 					return accessToken;
 				})
 				.block();
@@ -151,7 +152,7 @@ public class AuthService {
 					true
 			);
 
-			auditService.logAcao("Usuario criado", register.email());
+			auditService.logAcao(register.email(), AuditAcao.REGISTRO.getAuditAcao(), "Usuario criado");
 
 			userRepository.save(userEntity);
 

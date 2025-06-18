@@ -13,10 +13,11 @@ public class AuditService {
     @Autowired
     AuditRepository auditRepository;
 
-    public void logAcao(String acao, String email){
+    public void logAcao(String email, String acao, String conteudo){
         AuditEntry log = new AuditEntry();
-        log.setAcao(acao);
         log.setEmail(email);
+        log.setAcao(acao);
+        log.setConteudo(conteudo);
         log.setData(Timestamp.from(Instant.now()));
         auditRepository.save(log);
     }
