@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
@@ -25,7 +25,7 @@ public class AuditEntry {
     private UUID id;
 
     @NotNull
-    private Date data;
+    private Timestamp data;
 
     @NotEmpty
     private String email;

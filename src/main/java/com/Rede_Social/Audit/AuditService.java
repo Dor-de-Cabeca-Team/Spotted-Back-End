@@ -3,6 +3,7 @@ package com.Rede_Social.Audit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +17,7 @@ public class AuditService {
         AuditEntry log = new AuditEntry();
         log.setAcao(acao);
         log.setEmail(email);
-        log.setData(Date.from(Instant.now()));
+        log.setData(Timestamp.from(Instant.now()));
         auditRepository.save(log);
     }
 

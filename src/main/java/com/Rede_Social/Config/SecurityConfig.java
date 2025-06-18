@@ -52,7 +52,7 @@ public class SecurityConfig {
     public CorsConfiguration corsConfiguration() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(Arrays.asList("https://10.35.232.57:443, https://192.168.0.20:443")); // Permite apenas o frontend
+        config.setAllowedOrigins(List.of("https://spottedua.com.br"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         config.setMaxAge(3600L);
