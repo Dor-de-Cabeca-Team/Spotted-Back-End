@@ -1,5 +1,13 @@
 package com.Rede_Social.Audit;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public enum AuditAcao {
     POST("Post"),
     COMENTARIO("Comentário"),
@@ -8,13 +16,5 @@ public enum AuditAcao {
     LOGIN("Login"),
     REGISTRO("Registro");
 
-    private final String descricao;
-
-    AuditAcao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public String getAuditAcao() {
-        return descricao;
-    }
+    public String descricao;
 }

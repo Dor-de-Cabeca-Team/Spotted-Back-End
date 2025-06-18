@@ -62,7 +62,7 @@ public class CommentService {
 
             commentEntity.setProfileAnimal(ThreadLocalRandom.current().nextInt(1, 21));
 
-            auditService.logAcao(user.getEmail(), AuditAcao.COMENTARIO.getAuditAcao(), ("Comentario: " + commentEntity.getConteudo() + "\npost: " + post.getConteudo()));
+            auditService.logAcao(user.getEmail(), AuditAcao.COMENTARIO.getDescricao(), ("Comentario: " + commentEntity.getConteudo() + "\npost: " + post.getConteudo()));
 
             commentRepository.save(commentEntity);
 

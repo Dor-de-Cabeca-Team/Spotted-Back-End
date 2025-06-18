@@ -87,7 +87,7 @@ public class AuthService {
 						return userRepository.save(user);
 					});
 
-					auditService.logAcao(email, AuditAcao.LOGIN.getAuditAcao(), "Usuario logado");
+					auditService.logAcao(email, AuditAcao.LOGIN.getDescricao(), "Usuario logado");
 					return accessToken;
 				})
 				.block();
@@ -152,7 +152,7 @@ public class AuthService {
 					true
 			);
 
-			auditService.logAcao(register.email(), AuditAcao.REGISTRO.getAuditAcao(), "Usuario criado");
+			auditService.logAcao(register.email(), AuditAcao.REGISTRO.getDescricao(), "Usuario criado");
 
 			userRepository.save(userEntity);
 
