@@ -14,15 +14,24 @@ public class AuditService {
     AuditRepository auditRepository;
 
     public void logAcao(String email, String acao, String conteudo){
-        AuditEntry log = new AuditEntry();
-        log.setEmail(email);
-        log.setAcao(acao);
-        log.setConteudo(conteudo);
-        log.setData(Timestamp.from(Instant.now()));
-        auditRepository.save(log);
+        try {
+            AuditEntry log = new AuditEntry();
+            log.setEmail(email);
+            log.setAcao(acao);
+            log.setConteudo(conteudo);
+            log.setData(Timestamp.from(Instant.now()));
+            auditRepository.save(log);
+        } catch (Exception e){
+            throw new RuntimeException("Erro ao salvar o log da ação do usuario");
+        }
     }
 
     public List<AuditEntry> findAll(){
-        return auditRepository.findAll();
+        try{
+            return auditRepository.findAll();
+        }catch (Exception e){
+            System.out.println("Erro no service, não deu para listar os logs: " + e.getMessage());
+            throw new RuntimeException("Erro no service, não deu para listar os logs: " + e.getMessage());
+        }
     }
 }
