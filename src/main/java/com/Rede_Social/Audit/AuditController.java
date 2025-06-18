@@ -24,7 +24,7 @@ public class AuditController {
             List<AuditEntry> logs = auditService.findAll();
             return ResponseEntity.ok(logs);
         } catch(Exception e){
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.badRequest().build();
         }
     }
 }
