@@ -55,7 +55,8 @@ public class CommentService {
 
             CommentEntity commentEntity = new CommentEntity();
             commentEntity.setConteudo(comment.conteudo());
-            commentEntity.setValido(geminiService.validadeAI(commentEntity.getConteudo()));
+            //commentEntity.setValido(geminiService.validadeAI(commentEntity.getConteudo()));
+            commentEntity.setValido(true);
             commentEntity.setData(Instant.now());
             commentEntity.setUser(user);
             commentEntity.setPost(post);
