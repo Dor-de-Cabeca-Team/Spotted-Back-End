@@ -64,7 +64,7 @@ public class CommentService {
 
             auditService.logAcao(user.getEmail(), AuditAcao.COMENTARIO.getDescricao(), "Comentario criado\nComentario ID: " + commentEntity.getUuid() +
                                                                                        "\nComentario: " + commentEntity.getConteudo() +
-                                                                                       "\nPost: " + post.getConteudo());
+                                                                                       "\nPost ID: " + post.getUuid());
 
             commentRepository.save(commentEntity);
 
