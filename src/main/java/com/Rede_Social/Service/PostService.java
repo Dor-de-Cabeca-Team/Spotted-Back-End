@@ -83,7 +83,8 @@ public class PostService {
 
             postRepository.save(postEntity);
 
-            auditService.logAcao(usuario.getEmail(), AuditAcao.POST.getDescricao(), "Post criado: " + postEntity.getConteudo());
+            auditService.logAcao(usuario.getEmail(), AuditAcao.POST.getDescricao(), "Post criado\nPost ID: " + postEntity.getUuid() +
+                                                                                    "\nConteúdo:" + postEntity.getConteudo());
             return "Post Criado";
         } catch (UserNotFoundException e) {
             throw e;
@@ -125,7 +126,8 @@ public class PostService {
                 LikeEntity newLike = new LikeEntity(UUID.randomUUID(), Instant.now(), user, post, null);
                 likeRepository.save(newLike);
 
-                auditService.logAcao(user.getEmail(), AuditAcao.LIKE.getDescricao(), "Like criado\nPost: " + post.getConteudo());
+                auditService.logAcao(user.getEmail(), AuditAcao.LIKE.getDescricao(), "Like criado\nLike ID: " + newLike.getUuid() +
+                                                                                     "\nPost: " + post.getConteudo());
                 return "Like no Post dado";
             } else {
                 likeRepository.deleteById(existingLike.get().getUuid());
@@ -151,10 +153,13 @@ public class PostService {
                 LikeEntity like = new LikeEntity(UUID.randomUUID(), Instant.now(), user, null, comentario);
                 likeRepository.save(like);
 
-                auditService.logAcao(user.getEmail(), AuditAcao.LIKE.getDescricao(), "Like criado\nComentario: " + comentario.getConteudo() + "\nPost: " + comentario.getPost().getConteudo());
+                auditService.logAcao(user.getEmail(), AuditAcao.LIKE.getDescricao(), "Like criado\nLike ID: " + like.getUuid() +
+                                                                                     "\nComentario: " + comentario.getConteudo() +
+                                                                                     "\nPost: " + comentario.getPost().getConteudo());
                 return "Like no comentario dado";
             }else{
-                auditService.logAcao(user.getEmail(), AuditAcao.LIKE.getDescricao(), "Like deletado\nComentario: " + comentario.getConteudo() + "\nPost: " + comentario.getPost().getConteudo());
+                auditService.logAcao(user.getEmail(), AuditAcao.LIKE.getDescricao(), "Like deletado\nComentario: " + comentario.getConteudo() +
+                                                                                     "\nPost: " + comentario.getPost().getConteudo());
                 likeRepository.deleteById(existingLike.get().getUuid());
                 return "Like no Post removido";
             }
@@ -176,7 +181,8 @@ public class PostService {
                 ComplaintEntity denuncia = new ComplaintEntity(UUID.randomUUID(), user, post, null);
                 complaintRepository.save(denuncia);
 
-                auditService.logAcao(user.getEmail(), AuditAcao.DENUNCIA.getDescricao(), "Denuncia criada\nPost: " + post.getConteudo());
+                auditService.logAcao(user.getEmail(), AuditAcao.DENUNCIA.getDescricao(), "Denuncia criada\nDenuncia ID: " + denuncia.getUuid() +
+                                                                                         "\nPost: " + post.getConteudo());
                 return "Denuncia ao post feita";
             } else {
                 complaintRepository.deleteById(existingComplaint.get().getUuid());
@@ -204,12 +210,15 @@ public class PostService {
                 ComplaintEntity denuncia = new ComplaintEntity(UUID.randomUUID(), user, null, comment);
                 complaintRepository.save(denuncia);
 
-                auditService.logAcao(user.getEmail(), AuditAcao.DENUNCIA.getDescricao(), "Denuncia criada\nComentario: " + comment.getConteudo() + "\nPost: " + comment.getPost().getConteudo());
+                auditService.logAcao(user.getEmail(), AuditAcao.DENUNCIA.getDescricao(), "Denuncia criada\nDenuncia ID:" + denuncia.getUuid() +
+                                                                                         "\nComentario: " + comment.getConteudo() +
+                                                                                         "\nPost: " + comment.getPost().getConteudo());
                 return "Denúncia ao comentário feita";
             } else {
                 complaintRepository.deleteById(existingComplaint.get().getUuid());
 
-                auditService.logAcao(user.getEmail(), AuditAcao.DENUNCIA.getDescricao(), "Denuncia deletada\nComentario: " + comment.getConteudo() + "\nPost: " + comment.getPost().getConteudo());
+                auditService.logAcao(user.getEmail(), AuditAcao.DENUNCIA.getDescricao(), "Denuncia deletada\nComentario: " + comment.getConteudo() +
+                                                                                         "\nPost: " + comment.getPost().getConteudo());
                 return "Denúncia ao comentário removida";
             }
         } catch (UserNotFoundException e) {

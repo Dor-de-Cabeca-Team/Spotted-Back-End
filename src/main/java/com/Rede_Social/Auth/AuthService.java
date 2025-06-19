@@ -87,7 +87,7 @@ public class AuthService {
 						return userRepository.save(user);
 					});
 
-					auditService.logAcao(email, AuditAcao.LOGIN.getDescricao(), "Usuario logado");
+					auditService.logAcao(email, AuditAcao.LOGIN.getDescricao(), "Usuario logado\nUsuario ID: " + uuid);
 					return accessToken;
 				})
 				.block();
@@ -152,13 +152,13 @@ public class AuthService {
 					true
 			);
 
-			auditService.logAcao(register.email(), AuditAcao.REGISTRO.getDescricao(), "Usuario criado");
 
 			userRepository.save(userEntity);
 
 			// Associar o papel USUARIO no Keycloak
 			assignUserRole(keycloakId, adminToken);
 
+			auditService.logAcao(register.email(), AuditAcao.REGISTRO.getDescricao(), "Usuario criado\nUsuario ID: " + userEntity.getUuid());
 			return Map.of(
 					"userId", keycloakId,
 					"message", "Usuário registrado com sucesso"
