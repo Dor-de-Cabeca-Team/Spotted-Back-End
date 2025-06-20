@@ -63,12 +63,11 @@ public class CommentService {
 
             commentEntity.setProfileAnimal(ThreadLocalRandom.current().nextInt(1, 21));
 
+            commentRepository.save(commentEntity);
+
             auditService.logAcao(user.getEmail(), AuditAcao.COMENTARIO.getDescricao(), "Comentario criado\nComentario ID: " + commentEntity.getUuid() +
                                                                                        "\nComentario: " + commentEntity.getConteudo() +
                                                                                        "\nPost ID: " + post.getUuid());
-
-            commentRepository.save(commentEntity);
-
             return "comentário criado";
         } catch (Exception e) {
             System.out.println("Erro no service, não deu para salvar o comentário no repository: " + e.getMessage());
